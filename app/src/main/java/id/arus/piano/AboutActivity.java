@@ -44,23 +44,23 @@ public final class AboutActivity extends Activity {
             15);
     version.setTextIsSelectable(true);
     left.addView(version);
-    paragraph(left, "ASNkit · @radarswingid", "ASNkit · @radarswingid");
+    paragraph(left, "PianoFlow · @radarswingid", "PianoFlow · @radarswingid");
     paragraph(
         left,
         "Teman belajar piano Anda. Gratis, tanpa iklan, langganan, atau batas impor lagu.",
         "Your piano learning companion. Free, without ads, subscriptions or song import limits.");
-    heading(left, tr("Bantu ASNkit terus berkembang", "Help ASNkit keep growing"));
+    heading(left, tr("Bantu PianoFlow terus berkembang", "Help PianoFlow keep growing"));
     paragraph(
         left,
         "Masukan, ide, dan kontribusi Anda membantu PianoFlow menjadi teman belajar piano yang"
             + " semakin baik. Jika PianoFlow bermanfaat, Anda dapat mendukung pengembangannya"
             + " melalui Trakteer @radarswingid. Dukungan Anda memberi waktu dan semangat untuk"
             + " menghadirkan perbaikan serta fitur baru. Terima kasih sudah menjadi bagian dari"
-            + " perjalanan ASNkit.",
+            + " perjalanan PianoFlow.",
         "Your feedback, ideas and contributions help make PianoFlow a better piano learning"
             + " companion. If you find it useful, you can support its development through Trakteer"
             + " @radarswingid. Your support gives us time and encouragement to improve the app and"
-            + " create new features. Thank you for being part of ASNkit’s journey.");
+            + " create new features. Thank you for being part of PianoFlow’s journey.");
     paragraph(
         left,
         "Dukungan bersifat sukarela. Seluruh fitur tetap gratis dan dapat digunakan tanpa donasi.",

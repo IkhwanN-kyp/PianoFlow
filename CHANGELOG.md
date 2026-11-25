@@ -1,8 +1,13 @@
 # Changelog
 
+## [0.2.0-beta.4] - 2026-11-26
+
+- Correct the support section to use PianoFlow consistently in Indonesian and English; keep @radarswingid and the optional Trakteer link.
+- Preserve all application features, signing identity, package ID and user data.
+
 ## [0.2.0-beta.3] - 2026-11-26
 
-- Add About with installed version and version code, ASNkit / @radarswingid credit and optional Trakteer support.
+- Add About with installed version and version code, PianoFlow / @radarswingid credit and optional Trakteer support.
 - Add Indonesian/English credits, upstream GitHub links and an offline viewer for original bundled licenses.
 - Clarify independent development and MIDIVisualizer visual inspiration; retain existing features, package ID, signing identity and user data.
 

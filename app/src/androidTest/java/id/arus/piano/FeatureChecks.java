@@ -195,7 +195,10 @@ final class FeatureChecks {
                     && text.contains("" + BuildConfig.VERSION_CODE),
                 "About displays installed version and code");
             test.ok(
-                text.contains("ASNkit")
+                text.contains(
+                        english
+                            ? "Help PianoFlow keep growing"
+                            : "Bantu PianoFlow terus berkembang")
                     && text.contains("@radarswingid")
                     && text.contains(english ? "entirely optional" : "bersifat sukarela"),
                 "About contains author credit and optional support in selected language");
