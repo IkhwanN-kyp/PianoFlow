@@ -33,6 +33,10 @@ public final class AboutActivity extends Activity {
     columns.addView(left, new LinearLayout.LayoutParams(0, -2, 1));
     columns.addView(right, new LinearLayout.LayoutParams(0, -2, 1));
     heading(left, "PianoFlow");
+    paragraph(
+        left,
+        "Belajar, dengarkan, dan mainkan piano dengan cara Anda.",
+        "Learn, listen and play piano your way.");
     TextView version =
         Ui.text(
             this,
@@ -73,26 +77,44 @@ public final class AboutActivity extends Activity {
             "Source code & kontribusi GitHub ↗",
             "Source code & contribute on GitHub ↗",
             () -> open(SOURCE_URL)));
-    heading(right, tr("Kredit & sumber terbuka", "Credits & open source"));
+    heading(right, tr("Panduan & informasi", "Guide & information"));
+    paragraph(
+        right,
+        "Latihan lagu dengan falling notes atau partitur. Bermain bebas dengan animasi nada naik."
+            + " Label huruf, angka, dan Do–Re–Mi membantu mengenali tuts.",
+        "Practice songs with falling notes or sheet music. Play freely with rising note bars."
+            + " Letter, number and Do–Re–Mi labels help you learn the keys.");
+    right.addView(
+        Ui.button(
+            this,
+            "Buka bantuan & panduan",
+            "Open help & guide",
+            () -> {
+              startActivity(new Intent(this, HelpActivity.class));
+              finish();
+            }));
+    paragraph(
+        right,
+        "Android APK ARM64 · tanpa Google Play Services. Ditujukan untuk MatePad HarmonyOS 4.2;"
+            + " pengujian fisik TGR-W09 dan Yamaha P-145 belum dilakukan.",
+        "Android ARM64 APK · no Google Play Services. Intended for MatePad HarmonyOS 4.2; physical"
+            + " TGR-W09 and Yamaha P-145 testing is still outstanding.");
+    heading(right, tr("Kredit & lisensi", "Credits & licenses"));
     paragraph(
         right,
         "PianoFlow dikembangkan secara mandiri. MIDIVisualizer menjadi referensi visual; aplikasi"
             + " ini bukan fork dan tidak menyertakan kode atau asetnya.",
         "PianoFlow is independently developed. MIDIVisualizer is a visual reference; this app is"
             + " not a fork and does not include its code or assets.");
-    credit(
+    paragraph(
         right,
-        "MIDIVisualizer · Simon Rodriguez · MIT",
-        "https://github.com/kosua20/MIDIVisualizer");
-    credit(right, "FluidSynth · LGPL-2.1", "https://github.com/FluidSynth/fluidsynth");
-    credit(
-        right,
-        "TimGM6mb · Tim Brechbill / David Bolton · GPL-2.0",
-        "https://github.com/arbruijn/TimGM6mb");
-    credit(right, "Basic Pitch · Spotify · Apache-2.0", "https://github.com/spotify/basic-pitch");
-    credit(right, "Bravura · Steinberg · SIL OFL 1.1", "https://github.com/steinbergmedia/bravura");
-    credit(right, "TensorFlow Lite · Apache-2.0", "https://github.com/tensorflow/tensorflow");
-    credit(right, "Oboe · Apache-2.0", "https://github.com/google/oboe");
+        "Audio FluidSynth (LGPL-2.1) · SoundFont TimGM6mb (GPL-2.0) · font Bravura (OFL) · Basic"
+            + " Pitch dan TensorFlow Lite (Apache-2.0).",
+        "FluidSynth audio (LGPL-2.1) · TimGM6mb SoundFont (GPL-2.0) · Bravura font (OFL) · Basic"
+            + " Pitch and TensorFlow Lite (Apache-2.0).");
+    right.addView(
+        Ui.button(
+            this, "Lihat kredit & sumber komponen", "Component credits & sources", this::credits));
     right.addView(Ui.button(this, "Baca lisensi offline", "Read licenses offline", this::licenses));
     right.addView(
         Ui.button(
@@ -109,6 +131,28 @@ public final class AboutActivity extends Activity {
     scroll.addView(columns);
     root.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
     setContentView(root);
+  }
+
+  private void credits() {
+    ScrollView scroll = new ScrollView(this);
+    LinearLayout box = Ui.column(this);
+    credit(
+        box, "MIDIVisualizer · Simon Rodriguez · MIT", "https://github.com/kosua20/MIDIVisualizer");
+    credit(box, "FluidSynth · LGPL-2.1", "https://github.com/FluidSynth/fluidsynth");
+    credit(
+        box,
+        "TimGM6mb · Tim Brechbill / David Bolton · GPL-2.0",
+        "https://github.com/arbruijn/TimGM6mb");
+    credit(box, "Basic Pitch · Spotify · Apache-2.0", "https://github.com/spotify/basic-pitch");
+    credit(box, "Bravura · Steinberg · SIL OFL 1.1", "https://github.com/steinbergmedia/bravura");
+    credit(box, "TensorFlow Lite · Apache-2.0", "https://github.com/tensorflow/tensorflow");
+    credit(box, "Oboe · Apache-2.0", "https://github.com/google/oboe");
+    scroll.addView(box);
+    new AlertDialog.Builder(this)
+        .setTitle(tr("Kredit komponen", "Component credits"))
+        .setView(scroll)
+        .setPositiveButton(tr("Selesai", "Done"), null)
+        .show();
   }
 
   private String tr(String id, String en) {

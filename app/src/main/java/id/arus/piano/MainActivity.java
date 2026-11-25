@@ -22,6 +22,9 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
   private TextView title, status, tempoLabel;
   private Button play, mode, waitButton, handButton, audioButton, outButton, importButton;
   private SeekBar position, tempoSlider;
+  private LinearLayout timeline, songControls;
+  private Button freeButton, clearLive;
+  private boolean freePlay = false;
   private final ExecutorService loader = Executors.newSingleThreadExecutor();
   private final ExecutorService updateChecks = Executors.newSingleThreadExecutor();
   private final boolean[][] hardware = new boolean[16][128];
@@ -70,6 +73,7 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
     program = settings().getInt("program", 0);
     synth.program(program);
     synth.configure(settings().getInt("polyphony", 128), settings().getBoolean("reverb", true));
+    freePlay = settings().getBoolean("freePlay", false);
     buildUi();
     midi = new MidiHub(this, this);
     String bank = settings().getString("soundfont", "");
@@ -159,13 +163,18 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
     status.setSingleLine(true);
     status.setEllipsize(android.text.TextUtils.TruncateAt.END);
     sub.addView(status, new LinearLayout.LayoutParams(0, dp(42), 1));
+    freeButton = button(tr("Bermain bebas", "Free play"), () -> setFreePlay(!freePlay));
+    sub.addView(freeButton);
+    sub.addView(button(tr("Label tuts", "Key labels"), this::keyLabels));
     sub.addView(button("MIDI / USB", () -> midi.menu()));
     sub.addView(button(tr("Instrumen", "Instrument"), this::instruments));
     root.addView(sub);
     piano = new PianoView(this, trainer, this);
     piano.displayMode = settings().getInt("view", 0);
+    piano.labelMode = NoteLabels.valid(settings().getInt("keyLabels", NoteLabels.LETTERS));
+    piano.setFreePlay(freePlay);
     root.addView(piano, new LinearLayout.LayoutParams(-1, 0, 1));
-    LinearLayout timeline = row();
+    timeline = row();
     timeline.setPadding(dp(12), 0, dp(12), 0);
     timeline.addView(button("↺ Awal", () -> seek(trainer.loop ? trainer.loopA : 0)));
     position = new SeekBar(this);
@@ -213,6 +222,8 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
     scroll.setHorizontalScrollBarEnabled(true);
     LinearLayout controls = row();
     controls.setPadding(dp(12), 0, dp(12), dp(6));
+    songControls = row();
+    controls.addView(songControls);
     play =
         button(
             "▶ Mulai",
@@ -222,7 +233,7 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
                 seek(trainer.loop ? trainer.loopA : 0);
               if (!trainer.playing) quiet();
             });
-    controls.addView(play);
+    songControls.addView(play);
     mode =
         button(
             trainer.listen ? "Dengarkan" : "Latihan",
@@ -232,7 +243,7 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
               trainer.seek(trainer.time);
               mode.setText(Ui.t(this, trainer.listen ? "Dengarkan" : "Latihan"));
             });
-    controls.addView(mode);
+    songControls.addView(mode);
     waitButton =
         button(
             trainer.wait ? "Tunggu: ON" : "Tunggu: OFF",
@@ -240,11 +251,11 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
               trainer.wait = !trainer.wait;
               waitButton.setText(Ui.t(this, trainer.wait ? "Tunggu: ON" : "Tunggu: OFF"));
             });
-    controls.addView(waitButton);
+    songControls.addView(waitButton);
     handButton = button("Dua tangan", this::hands);
-    controls.addView(handButton);
+    songControls.addView(handButton);
     tempoLabel = label("100%", 12);
-    controls.addView(tempoLabel, new LinearLayout.LayoutParams(dp(42), dp(40)));
+    songControls.addView(tempoLabel, new LinearLayout.LayoutParams(dp(42), dp(40)));
     SeekBar tempo = new SeekBar(this);
     tempoSlider = tempo;
     tempo.setMax(175);
@@ -260,8 +271,8 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
 
           public void onStopTrackingTouch(SeekBar s) {}
         });
-    controls.addView(tempo, new LinearLayout.LayoutParams(dp(100), dp(40)));
-    controls.addView(
+    songControls.addView(tempo, new LinearLayout.LayoutParams(dp(100), dp(40)));
+    songControls.addView(
         button(
             tr("Tampilan", "View"),
             () ->
@@ -290,11 +301,12 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
               if (external) midi.sendMessage(0xb0 | outputChannel, 64, pedal ? 127 : 0);
               status("Sustain " + (pedal ? "ON" : "OFF"));
             }));
-    controls.addView(button("PDF", () -> pickPdf()));
-    controls.addView(
+    songControls.addView(button("PDF", () -> pickPdf()));
+    songControls.addView(
         button(
             "Demo",
             () -> {
+              setFreePlay(false);
               loadGeneration++;
               importButton.setEnabled(true);
               quiet();
@@ -304,9 +316,75 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
               title.setText(name);
               getPreferences(0).edit().remove("uri").remove("currentSong").apply();
             }));
+    clearLive = button(tr("Hentikan & bersihkan", "Stop & clear"), this::resetLiveInput);
+    controls.addView(clearLive);
     scroll.addView(controls);
     root.addView(scroll);
     setContentView(root);
+    updateLearningControls();
+  }
+
+  private void setFreePlay(boolean enabled) {
+    if (freePlay == enabled) return;
+    saveSession();
+    trainer.playing = false;
+    resetLiveInput();
+    freePlay = enabled;
+    piano.setFreePlay(enabled);
+    settings().edit().putBoolean("freePlay", enabled).apply();
+    updateLearningControls();
+    status(
+        enabled
+            ? tr(
+                "Mainkan tuts layar atau piano MIDI. Balok mengikuti lama tuts ditahan.",
+                "Play the screen keys or MIDI piano. Bars follow how long you hold each key.")
+            : tr("Lagu siap dilanjutkan", "Song ready to resume"));
+  }
+
+  private void updateLearningControls() {
+    timeline.setVisibility(freePlay ? View.GONE : View.VISIBLE);
+    songControls.setVisibility(freePlay ? View.GONE : View.VISIBLE);
+    outButton.setVisibility(freePlay ? View.GONE : View.VISIBLE);
+    clearLive.setVisibility(freePlay ? View.VISIBLE : View.GONE);
+    freeButton.setText(
+        tr(
+            freePlay ? "Kembali ke lagu" : "Bermain bebas",
+            freePlay ? "Back to song" : "Free play"));
+    title.setText(freePlay ? tr("Bermain bebas", "Free play") : name);
+  }
+
+  private void resetLiveInput() {
+    if (piano != null) piano.releaseTouches();
+    for (boolean[] channel : hardware) Arrays.fill(channel, false);
+    Arrays.fill(touchCount, 0);
+    computerKeys.clear();
+    quiet();
+    if (piano != null) {
+      Arrays.fill(piano.down, false);
+      piano.live.clear();
+      piano.invalidate();
+    }
+  }
+
+  private void keyLabels() {
+    new AlertDialog.Builder(this)
+        .setTitle(tr("Label tuts · Do = C", "Key labels · Do = C"))
+        .setSingleChoiceItems(
+            new String[] {
+              tr("Huruf · C D E F G A B", "Letters · C D E F G A B"),
+              tr("Angka · 1 2 3 4 5 6 7", "Numbers · 1 2 3 4 5 6 7"),
+              "Do Re Mi Fa Sol La Si",
+              tr("Tanpa label", "No labels")
+            },
+            piano.labelMode,
+            (dialog, which) -> {
+              piano.labelMode = NoteLabels.valid(which);
+              settings().edit().putInt("keyLabels", piano.labelMode).apply();
+              piano.invalidate();
+              dialog.dismiss();
+            })
+        .setNegativeButton(tr("Batal", "Cancel"), null)
+        .show();
   }
 
   private void hands() {
@@ -465,7 +543,8 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
             runOnUiThread(
                 () -> {
                   if (destroyed || generation != loadGeneration) return;
-                  quiet();
+                  if (store) setFreePlay(false);
+                  if (!freePlay) quiet();
                   trainer.load(song);
                   if (xml)
                     for (int id : song.tracks.keySet()) trainer.roles.put(id, id % 2 == 0 ? 1 : 2);
@@ -481,6 +560,7 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
                       .remove("uri")
                       .apply();
                   if (!store) restoreSession();
+                  updateLearningControls();
                   status(
                       song.notes.size()
                           + tr(" not · ", " notes · ")
@@ -653,7 +733,7 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
       tr("Tema gelap / terang", "Dark / light theme"),
       "Bahasa / Language",
       tr("Ikuti program MIDI: ", "Follow MIDI programs: ") + (followPrograms ? "ON" : "OFF"),
-      tr("Bantuan & lisensi", "Help & licenses"),
+      tr("Bantuan & panduan", "Help & guide"),
       tr("Tentang aplikasi", "About")
     };
     new AlertDialog.Builder(this)
@@ -772,41 +852,9 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
   }
 
   private void help() {
-    new AlertDialog.Builder(this)
-        .setTitle("PianoFlow " + BuildConfig.VERSION_NAME)
-        .setMessage(
-            tr(
-                "USB TO HOST P-145 → kabel USB 2.0 A–B (<3 m) → adaptor USB-C OTG → tablet. Piano"
-                    + " memakai dayanya sendiri. Pilih Input di MIDI / USB; coba USB host bila"
-                    + " Android MIDI API tidak tersedia. P-145 tidak memiliki lampu tuts.\n\n"
-                    + "Latihan + Tunggu ON menunggu seluruh akor. OFF menilai onset ±180 ms waktu"
-                    + " lagu. Dengarkan memutar MIDI. Tempo 25–200%, loop A/B dan pengaturan tangan"
-                    + " tersedia. Keyboard komputer A W S E D F T G Y H U J K O L P ; dari C4.\n\n"
-                    + "Partitur adalah notasi pembelajaran dengan kuantisasi tampilan 1/16; bukan"
-                    + " engraving profesional. Konversi Basic Pitch perlu modul .tflite opsional"
-                    + " dan dapat salah pada rekaman campuran. Koreksi hasil sebelum latihan.\n\n"
-                    + "Audio: FluidSynth 2.6.3 (LGPL-2.1), TimGM6mb (GPL-2), font Bravura (OFL),"
-                    + " Basic Pitch (Apache-2.0). Salinan lisensi dan source tersedia pada"
-                    + " repository/rilis. Tanpa iklan, akun wajib atau API berbayar.\n\n"
-                    + "Belum diuji fisik pada HarmonyOS TGR-W09/P-145; pengukuran latensi belum"
-                    + " tersedia.",
-                "P-145 USB TO HOST → USB 2.0 A–B cable (<3 m) → USB-C OTG adapter → tablet. Power"
-                    + " the piano separately. Choose Input in MIDI / USB; use raw USB host if"
-                    + " Android MIDI is unavailable. The P-145 has no key lights.\n\n"
-                    + "Practice + Wait ON holds each chord. OFF scores onset within ±180 ms song"
-                    + " time. Listen plays MIDI. Tempo 25–200%, A/B loops and hand assignment"
-                    + " remain available. Computer keys A W S E D F T G Y H U J K O L P ; start at"
-                    + " C4.\n\n"
-                    + "Sheet music uses display-only sixteenth-note quantization, not professional"
-                    + " engraving. Basic Pitch needs an optional .tflite model and may misread"
-                    + " mixed recordings. Review before practice.\n\n"
-                    + "Audio: FluidSynth 2.6.3 (LGPL-2.1), TimGM6mb (GPL-2), Bravura font (OFL),"
-                    + " Basic Pitch (Apache-2.0). License copies and source are in the"
-                    + " repository/releases. No ads, mandatory account or paid APIs.\n\n"
-                    + "Physical HarmonyOS TGR-W09/P-145 testing and latency measurement remain"
-                    + " outstanding."))
-        .setPositiveButton("OK", null)
-        .show();
+    trainer.playing = false;
+    quiet();
+    startActivity(new Intent(this, HelpActivity.class));
   }
 
   private void seek(double time) {
@@ -820,9 +868,13 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
   public void touch(int pitch, boolean on) {
     int old = touchCount[pitch];
     touchCount[pitch] = Math.max(0, old + (on ? 1 : -1));
-    if (on) trainer.press(pitch);
+    if (on && !freePlay) trainer.press(pitch);
     if (audio && !external && ((old == 0 && on) || (touchCount[pitch] == 0 && !on)))
       synth.key(pitch, 85, on);
+    if (freePlay && audio && external && ((old == 0 && on) || (touchCount[pitch] == 0 && !on))) {
+      midi.noteOut(outputChannel, pitch, 85, on);
+      sent[pitch] = on;
+    }
     refreshKey(pitch);
   }
 
@@ -841,17 +893,20 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
 
   @Override
   public void note(int channel, int pitch, int velocity, boolean on) {
-    if (channel < 0 || channel > 15 || pitch < 0 || pitch > 127) return;
+    if (!resumed || channel < 0 || channel > 15 || pitch < 0 || pitch > 127) return;
     hardware[channel][pitch] = on;
-    if (on) trainer.press(pitch);
-    refreshKey(pitch);
+    if (on && !freePlay) trainer.press(pitch);
+    refreshKey(pitch, velocity);
   }
 
   private void refreshKey(int pitch) {
+    refreshKey(pitch, 85);
+  }
+
+  private void refreshKey(int pitch, int velocity) {
     boolean held = touchCount[pitch] > 0;
     for (int c = 0; c < 16; c++) held |= hardware[c][pitch];
-    piano.down[pitch] = held;
-    piano.invalidate();
+    piano.keyState(pitch, held, velocity);
   }
 
   @Override
@@ -889,6 +944,7 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
 
   @Override
   public void frame() {
+    if (freePlay) return;
     double t = trainer.time;
     boolean reset = lastSong != trainer.song || lastTime < 0 || t < lastTime;
     if (reset) {

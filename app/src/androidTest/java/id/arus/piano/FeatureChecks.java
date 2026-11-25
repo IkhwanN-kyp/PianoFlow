@@ -171,8 +171,162 @@ final class FeatureChecks {
           }
         });
     checkAbout(test, context);
+    checkLive(test, activity);
+    checkHelp(test, context);
     File future = new File(context.getFilesDir(), "update-fixture.apk");
     if (future.isFile()) verifyUpdate(test, context, future);
+  }
+
+  private static void checkLive(SmokeInstrumentation test, MainActivity activity) throws Exception {
+    test.waitForIdleSync();
+    PianoView piano = (PianoView) test.field(activity, "piano");
+    Trainer trainer = (Trainer) test.field(activity, "trainer");
+    MidiSong song = trainer.song;
+    test.click("Bermain bebas");
+    final double time = trainer.time;
+    final int hits = trainer.hits, wrong = trainer.wrong;
+    test.runOnMainSync(
+        () -> {
+          test.ok(piano.freePlay && !trainer.playing, "free play pauses song without replacing it");
+          activity.touch(60, true);
+          activity.touch(64, true);
+          activity.note(1, 60, 111, true);
+          test.ok(
+              piano.live.notes().size() == 2 && piano.down[60] && piano.down[64],
+              "free play captures touch chord without duplicate MIDI overlap");
+          activity.touch(60, false);
+          test.ok(
+              piano.down[60] && piano.live.notes().get(0).held(),
+              "same pitch remains held by another input source");
+        });
+    android.os.SystemClock.sleep(180);
+    final int[] before = new int[1];
+    test.runOnMainSync(() -> before[0] = liveTop(test, piano));
+    android.os.SystemClock.sleep(250);
+    test.runOnMainSync(
+        () -> {
+          int after = liveTop(test, piano);
+          test.ok(
+              before[0] >= 0 && after >= 0 && after < before[0],
+              "rendered live bar physically moves upward while held");
+          test.ok(
+              trainer.time == time && trainer.hits == hits && trainer.wrong == wrong,
+              "free play leaves song position and score unchanged");
+          activity.note(1, 60, 0, false);
+          activity.touch(64, false);
+          test.ok(
+              !piano.down[60] && !piano.down[64] && !piano.live.notes().get(0).held(),
+              "live note off detaches trail from keyboard");
+          activity.note(0, 67, 120, true);
+          test.ok(piano.live.notes().get(2).velocity == 120, "MIDI velocity reaches rising trail");
+          activity.disconnected();
+          test.ok(
+              !piano.down[67] && !piano.live.notes().get(2).held(),
+              "USB disconnect releases live MIDI key");
+          for (int mode = 0; mode < 4; mode++) {
+            piano.labelMode = mode;
+            android.graphics.Bitmap bitmap =
+                android.graphics.Bitmap.createBitmap(
+                    piano.getWidth(), piano.getHeight(), android.graphics.Bitmap.Config.ARGB_8888);
+            piano.draw(new android.graphics.Canvas(bitmap));
+            bitmap.recycle();
+          }
+          test.ok(true, "all keyboard label modes render in live mode");
+        });
+    test.click("Hentikan & bersihkan");
+    test.runOnMainSync(
+        () -> test.ok(piano.live.notes().isEmpty(), "stop and clear removes all live trails"));
+    test.runOnMainSync(
+        () -> {
+          activity.note(0, 60, 90, true);
+          test.callActivityOnPause(activity);
+          test.ok(
+              piano.live.notes().isEmpty() && !piano.down[60],
+              "background clears live notes and keyboard state");
+          activity.note(0, 64, 90, true);
+          test.ok(!piano.down[64], "paused activity ignores incoming MIDI state");
+          test.callActivityOnResume(activity);
+        });
+    test.click("Kembali ke lagu");
+    test.runOnMainSync(
+        () -> {
+          test.ok(
+              !piano.freePlay && trainer.song == song && trainer.time == time && !trainer.playing,
+              "return to song preserves exact position, song and pause state");
+          piano.labelMode = NoteLabels.LETTERS;
+        });
+  }
+
+  private static int liveTop(SmokeInstrumentation test, PianoView piano) {
+    try {
+      android.graphics.RectF[] keys = (android.graphics.RectF[]) test.field(piano, "keys");
+      int top = (int) (float) test.field(piano, "top"),
+          bottom = (int) (float) test.field(piano, "bottom");
+      android.graphics.Bitmap bitmap =
+          android.graphics.Bitmap.createBitmap(
+              piano.getWidth(), piano.getHeight(), android.graphics.Bitmap.Config.ARGB_8888);
+      piano.draw(new android.graphics.Canvas(bitmap));
+      int found = -1, x = Math.round(keys[60].centerX());
+      for (int y = top; y < bottom - 4; y++) {
+        int color = bitmap.getPixel(x, y),
+            red = android.graphics.Color.red(color),
+            green = android.graphics.Color.green(color),
+            blue = android.graphics.Color.blue(color);
+        if (green > 130 && green > red * 1.6 && Math.abs(blue - green) < 45) {
+          found = y;
+          break;
+        }
+      }
+      bitmap.recycle();
+      return found;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static void checkHelp(SmokeInstrumentation test, Context context) {
+    for (boolean english : new boolean[] {false, true}) {
+      context
+          .getSharedPreferences("settings", 0)
+          .edit()
+          .putString("language", english ? "en" : "id")
+          .putBoolean("light", english)
+          .commit();
+      HelpActivity help =
+          (HelpActivity)
+              test.startActivitySync(
+                  new Intent(context, HelpActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+      test.waitForIdleSync();
+      test.runOnMainSync(
+          () -> {
+            Button topic =
+                test.find(
+                    help.getWindow().getDecorView(),
+                    english ? "Free play & labels" : "Bermain bebas & label");
+            test.ok(topic != null, "offline help has topic navigation in selected language");
+            topic.performClick();
+            String text = allText(help.getWindow().getDecorView());
+            test.ok(
+                text.contains(english ? "Rising note bars" : "Balok bergerak ke atas")
+                    && text.contains("Do♯"),
+                "free play guide explains direction and chromatic labels");
+            test.find(
+                    help.getWindow().getDecorView(),
+                    english ? "MIDI / USB connection" : "Sambungan MIDI / USB")
+                .performClick();
+            test.ok(
+                allText(help.getWindow().getDecorView()).contains("USB TO HOST"),
+                "offline connection guide is actionable");
+            help.finish();
+          });
+    }
+    context
+        .getSharedPreferences("settings", 0)
+        .edit()
+        .putString("language", "id")
+        .putBoolean("light", false)
+        .commit();
+    test.waitForIdleSync();
   }
 
   private static void checkAbout(SmokeInstrumentation test, Context context) {

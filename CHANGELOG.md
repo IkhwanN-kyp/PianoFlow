@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.0-beta.5] - 2026-11-26
+
+- Add Free play with live rising note bars for multitouch, computer keyboard and MIDI input; bars follow physical key duration and MIDI velocity.
+- Preserve song position and score when switching modes; add Stop & clear, bounded animation history, input-source overlap handling and lifecycle/disconnect cleanup.
+- Add persistent 88-key letter, fixed-C number, fixed-Do solfege and hidden label choices, including chromatic sharp labels and octave anchors.
+- Replace the help dialog with a bilingual offline guide grouped by task, and reorganize About with clearer information and component credits.
+- Dispatch free-play screen-key MIDI output immediately; retain prior training, audio, conversion, notation, updater, signing identity and data.
+
 ## [0.2.0-beta.4] - 2026-11-26
 
 - Correct the support section to use PianoFlow consistently in Indonesian and English; keep @radarswingid and the optional Trakteer link.

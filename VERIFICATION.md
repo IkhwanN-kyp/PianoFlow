@@ -1,6 +1,17 @@
-# Verifikasi PianoFlow 0.2.0-beta.4
+# Verifikasi PianoFlow 0.2.0-beta.5
 
 Diperiksa 26 November 2026 (Asia/Jakarta). Hasil kompilasi, emulator dan hardware dipisahkan.
+
+## Bermain bebas, label, dan panduan beta.5
+
+- Build native ARM64 dan Android lint berhasil; pemeriksaan core lama 43 assertion + 300 mutasi dan 110 pemeriksaan tetap lolos. Tambahan 391 pemeriksaan mencakup arah/durasi jejak, memori terbatas, retrigger, batas input, serta label 88 tuts.
+- Emulator ARM64 Android 11/API 30 lulus 207 pemeriksaan runtime. Termasuk pembuktian melalui piksel bahwa balok bergerak ke atas, akor touch, MIDI velocity, nada sama dari dua sumber, Note Off, putus MIDI, background/resume, serta lagu/posisi/skor yang dipertahankan saat berganti mode.
+- Semua pilihan label dirender. Pilihan Do–Re–Mi melalui menu benar-benar tersimpan setelah proses aplikasi ditutup dan diluncurkan kembali. Screenshot berasal dari aplikasi native, bukan mockup.
+- Bantuan bertopik diuji dalam Indonesia/tema gelap dan English/tema terang. Tentang memuat versi/kode, informasi fitur, panduan, kredit dan lisensi yang tetap tersedia.
+- Belum diuji dengan MatePad/P-145 fisik; latensi USB dan audio tidak diukur. Animasi mengikuti penekanan fisik tuts, bukan lamanya decay suara setelah sustain.
+
+![Bermain bebas](docs/screenshots/freeplay-solfege.png)
+![Panduan offline](docs/screenshots/help-freeplay.png)
 
 ## Koreksi nama beta.4
 

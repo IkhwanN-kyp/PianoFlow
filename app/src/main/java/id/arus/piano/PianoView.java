@@ -15,6 +15,31 @@ public final class PianoView extends View {
   }
 
   public int displayMode = 0;
+  public int labelMode = NoteLabels.LETTERS;
+  public boolean freePlay = false;
+  final FreePlay live = new FreePlay();
+
+  private double seconds() {
+    return android.os.SystemClock.elapsedRealtimeNanos() / 1e9;
+  }
+
+  public void setFreePlay(boolean enabled) {
+    freePlay = enabled;
+    live.clear();
+    previous = 0;
+    invalidate();
+  }
+
+  public void keyState(int pitch, boolean held, int velocity) {
+    if (pitch < 0 || pitch > 127) return;
+    if (freePlay && held != down[pitch]) {
+      if (held) live.press(pitch, velocity, seconds());
+      else live.release(pitch, seconds());
+    }
+    down[pitch] = held;
+    invalidate();
+  }
+
   private final ScoreRenderer scoreRenderer;
   private final Host host;
   private final Trainer trainer;
@@ -55,6 +80,8 @@ public final class PianoView extends View {
     active = false;
     previous = 0;
     releaseTouches();
+    live.clear();
+    Arrays.fill(down, false);
   }
 
   public void releaseTouches() {
@@ -104,43 +131,49 @@ public final class PianoView extends View {
     super.onDraw(c);
     long now = android.os.SystemClock.elapsedRealtimeNanos();
     if (active) {
-      if (previous != 0) trainer.update((now - previous) / 1e9);
+      if (!freePlay && previous != 0) trainer.update((now - previous) / 1e9);
       previous = now;
       host.frame();
     }
     c.drawColor(Ui.bg(getContext()));
     float d = density, w = getWidth();
     String state =
-        trainer.listen
-            ? Ui.tr(getContext(), "DENGARKAN", "LISTEN")
-            : trainer.wait
-                ? Ui.tr(getContext(), "LATIHAN · TUNGGU NOT", "PRACTICE · WAIT FOR NOTE")
-                : Ui.tr(getContext(), "LATIHAN · RITME", "PRACTICE · RHYTHM");
+        freePlay
+            ? Ui.tr(getContext(), "BERMAIN BEBAS", "FREE PLAY")
+            : trainer.listen
+                ? Ui.tr(getContext(), "DENGARKAN", "LISTEN")
+                : trainer.wait
+                    ? Ui.tr(getContext(), "LATIHAN · TUNGGU NOT", "PRACTICE · WAIT FOR NOTE")
+                    : Ui.tr(getContext(), "LATIHAN · RITME", "PRACTICE · RHYTHM");
     text(c, state, 18 * d, 24 * d, 12, Ui.accent(getContext()));
     text(
         c,
-        String.format(
-            Locale.US,
-            "%02d:%02d  /  %02d:%02d",
-            (int) trainer.time / 60,
-            (int) trainer.time % 60,
-            (int) trainer.song.duration / 60,
-            (int) trainer.song.duration % 60),
+        freePlay
+            ? heldNames()
+            : String.format(
+                Locale.US,
+                "%02d:%02d  /  %02d:%02d",
+                (int) trainer.time / 60,
+                (int) trainer.time % 60,
+                (int) trainer.song.duration / 60,
+                (int) trainer.song.duration % 60),
         18 * d,
         44 * d,
         12,
         0xff91a0b8);
     String score =
-        trainer.listen
-            ? Ui.tr(getContext(), "Pratinjau offline", "Offline preview")
-            : trainer.hits
-                + Ui.tr(getContext(), " tepat  ·  ", " correct  ·  ")
-                + trainer.misses
-                + Ui.tr(getContext(), " lewat  ·  ", " missed  ·  ")
-                + trainer.wrong
-                + Ui.tr(getContext(), " salah  ·  ", " wrong  ·  ")
-                + trainer.accuracy()
-                + "%";
+        freePlay
+            ? Ui.tr(getContext(), "Nada naik saat dimainkan", "Notes rise as you play")
+            : trainer.listen
+                ? Ui.tr(getContext(), "Pratinjau offline", "Offline preview")
+                : trainer.hits
+                    + Ui.tr(getContext(), " tepat  ·  ", " correct  ·  ")
+                    + trainer.misses
+                    + Ui.tr(getContext(), " lewat  ·  ", " missed  ·  ")
+                    + trainer.wrong
+                    + Ui.tr(getContext(), " salah  ·  ", " wrong  ·  ")
+                    + trainer.accuracy()
+                    + "%";
     paint.setTextSize(12 * d);
     text(
         c,
@@ -150,8 +183,9 @@ public final class PianoView extends View {
         12,
         Ui.fg(getContext()));
     float savedTop = top;
-    if (displayMode == 2) top = savedTop + (bottom - savedTop) * .46f;
-    if (displayMode != 1) {
+    if (!freePlay && displayMode == 2) top = savedTop + (bottom - savedTop) * .46f;
+    if (freePlay) drawLive(c);
+    if (!freePlay && displayMode != 1) {
       color(Ui.light(getContext()) ? 0xffe6edf4 : 0xff141e30);
       c.drawRect(16 * d, top, w - 16 * d, bottom, paint);
       for (int n = 21; n <= 108; n++)
@@ -206,7 +240,7 @@ public final class PianoView extends View {
               Ui.fg(getContext()));
       }
     }
-    if (displayMode != 0)
+    if (!freePlay && displayMode != 0)
       scoreRenderer.draw(
           c,
           new RectF(16 * d, savedTop, w - 16 * d, displayMode == 2 ? top - 6 * d : bottom),
@@ -217,7 +251,7 @@ public final class PianoView extends View {
     top = savedTop;
     for (int n = 21; n <= 108; n++) if (!black(n)) drawKey(c, n);
     for (int n = 21; n <= 108; n++) if (black(n)) drawKey(c, n);
-    if (trainer.loop && trainer.loopB > trainer.loopA)
+    if (!freePlay && trainer.loop && trainer.loopB > trainer.loopA)
       text(
           c,
           String.format(Locale.US, "LOOP  %.1fs — %.1fs", trainer.loopA, trainer.loopB),
@@ -225,13 +259,65 @@ public final class PianoView extends View {
           44 * d,
           11,
           blue);
-    boolean moving = active && trainer.playing;
-    if (moving && !trainer.listen && trainer.wait) {
+    boolean moving = active && (freePlay ? live.moving(seconds()) : trainer.playing);
+    if (moving && !freePlay && !trainer.listen && trainer.wait) {
       int next = trainer.next();
       if (next >= 0 && trainer.song.notes.get(next).start <= trainer.time + .00001) moving = false;
     }
     if (moving) postInvalidateOnAnimation();
     else previous = 0;
+  }
+
+  private String heldNames() {
+    StringBuilder names = new StringBuilder();
+    int count = 0;
+    for (int n = 21; n <= 108; n++)
+      if (down[n]) {
+        if (count++ == 6) {
+          names.append(" …");
+          break;
+        }
+        if (names.length() > 0) names.append(" · ");
+        names.append(NoteLabels.scientific(n));
+      }
+    return names.length() == 0
+        ? Ui.tr(
+            getContext(),
+            "Sentuh tuts atau mainkan piano MIDI",
+            "Touch a key or play your MIDI piano")
+        : names.toString();
+  }
+
+  private void drawLive(Canvas c) {
+    double now = seconds();
+    live.prune(now);
+    float d = density, rate = (bottom - top) / (float) FreePlay.WINDOW;
+    color(Ui.light(getContext()) ? 0xffe6edf4 : 0xff141e30);
+    c.drawRect(16 * d, top, getWidth() - 16 * d, bottom, paint);
+    color(Ui.light(getContext()) ? 0xffcad5e3 : 0xff26334a);
+    paint.setStrokeWidth(d);
+    for (int n = 21; n <= 108; n++)
+      if (!black(n)) c.drawLine(keys[n].left, top, keys[n].left, bottom, paint);
+    for (int i = 1; i < 5; i++)
+      c.drawLine(16 * d, bottom - i * rate, getWidth() - 16 * d, bottom - i * rate, paint);
+    c.save();
+    c.clipRect(16 * d, top, getWidth() - 16 * d, bottom);
+    for (FreePlay.Note note : live.notes()) {
+      RectF k = keys[note.pitch];
+      float y1 = Math.max(top, bottom - (float) note.age(now) * rate);
+      float y2 = bottom - (float) note.releaseAge(now) * rate;
+      if (y2 < top) continue;
+      int base = note.pitch < 60 ? blue : mint;
+      int alpha = 150 + note.velocity * 105 / 127;
+      int col = (base & 0x00ffffff) | (alpha << 24);
+      box(c, k.left + 1, y1, k.right - 1, Math.max(y1 + 3 * d, y2), 3 * d, col);
+      color(0x66ffffff);
+      c.drawRect(k.left + 2, y1, k.right - 2, Math.min(y1 + 2 * d, y2), paint);
+    }
+    c.restore();
+    color(Ui.accent(getContext()));
+    paint.setStrokeWidth(2 * d);
+    c.drawLine(16 * d, bottom, getWidth() - 16 * d, bottom, paint);
   }
 
   private MidiSong cached;
@@ -266,16 +352,31 @@ public final class PianoView extends View {
       color(down[n] ? 0xff35a69e : 0xffb4c1d4);
       c.drawRect(k.left + 1, k.bottom - 5 * density, k.right - 1, k.bottom, paint);
     }
-    if (n % 12 == 0 || n == 21) {
-      String label = n == 21 ? "A0" : "C" + (n / 12 - 1);
-      paint.setTextSize(8 * density);
+    String label = NoteLabels.key(n, labelMode);
+    if (!label.isEmpty()) {
+      float size = (black(n) ? 7 : 9) * density;
+      paint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+      paint.setTextSize(size);
+      float width = paint.measureText(label);
+      if (width > k.width() - 2 * density) size *= Math.max(.5f, (k.width() - 2 * density) / width);
       text(
           c,
           label,
-          k.centerX() - paint.measureText(label) / 2,
-          k.bottom - 12 * density,
-          8,
-          0xff5b6c84);
+          k.centerX() - width * size / ((black(n) ? 7 : 9) * density) / 2,
+          k.bottom - (black(n) ? 8 : 18) * density,
+          size / density,
+          black(n) && !down[n] && !sounding[n] ? 0xffe4edf8 : 0xff33445e);
+      if (!black(n) && (n % 12 == 0 || n == 21)) {
+        String octave = NoteLabels.scientific(n);
+        paint.setTextSize(6 * density);
+        text(
+            c,
+            octave,
+            k.centerX() - paint.measureText(octave) / 2,
+            k.bottom - 7 * density,
+            6,
+            0xff5b6c84);
+      }
     }
     if (down[n] || sounding[n]) {
       color(0x8859dece);
