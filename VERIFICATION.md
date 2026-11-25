@@ -6,6 +6,10 @@ Diperiksa 26 November 2026 (Asia/Jakarta). Hasil kompilasi, emulator dan hardwar
 
 Build ARM64 dan lint berhasil. Emulator ARM64 lulus **185 pemeriksaan runtime**, termasuk versi/kode versi yang berasal dari BuildConfig, kredit ASNkit, dukungan sukarela, atribusi bukan-fork, serta render landscape dalam bahasa Indonesia/tema gelap dan English/tema terang. Core 43 assertion + 300 mutasi dan 110 pemeriksaan tambahan tetap lolos; enam regresi release tools dan 23 hash vendor/source lolos. Halaman Tentang memuat tautan GitHub/Trakteer dan pembaca teks lisensi offline. Pengujian perangkat fisik tetap belum dilakukan.
 
+Beta.3 diterbitkan otomatis dengan job test dan release sukses: https://github.com/IkhwanN-kyp/PianoFlow/actions/runs/45710616182 . CI tanpa Google Play Services lulus 178 pemeriksaan runtime (fixture privat ARM64 menambahkan tujuh pemeriksaan lokal). APK resmi berukuran 27.155.424 byte, non-debuggable, package `id.arus.piano`, versi `0.2.0-beta.3`, kode `2002003`; checksum dan signature diverifikasi ulang setelah unduhan. SHA-256: `1aa3fd824feb8b98eaf37baa22ff991a03657ae78a92af893069350c26ae976a`. Sertifikat sama dengan versi terdahulu. APK resmi berhasil dipasang menimpa versi emulator dan lulus kembali 185 pemeriksaan runtime, termasuk marker data lama yang tetap terbaca. Rilis: https://github.com/IkhwanN-kyp/PianoFlow/releases/tag/v0.2.0-beta.3 .
+
+![Tentang aplikasi](docs/screenshots/about-dark.png)
+
 ## Distribusi dan perbaikan penyimpanan
 
 Pipeline beta.1 sudah berhasil membangun, menguji, menandatangani dan memublikasikan APK: https://github.com/IkhwanN-kyp/PianoFlow/actions/runs/45603260090 . Beta.2 mempertahankan ID/nama/track kosong saat ekspor sehingga penetapan tangan tidak bergeser pada impor baru; regresi metadata dan track ditambahkan. File beta.1 tetap dapat dibaca.
