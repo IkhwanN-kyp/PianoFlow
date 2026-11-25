@@ -653,7 +653,8 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
       tr("Tema gelap / terang", "Dark / light theme"),
       "Bahasa / Language",
       tr("Ikuti program MIDI: ", "Follow MIDI programs: ") + (followPrograms ? "ON" : "OFF"),
-      tr("Bantuan & lisensi", "Help & licenses")
+      tr("Bantuan & lisensi", "Help & licenses"),
+      tr("Tentang aplikasi", "About")
     };
     new AlertDialog.Builder(this)
         .setTitle(tr("Pengaturan", "Settings"))
@@ -698,6 +699,7 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
                 status(tr("Ikuti program MIDI: ", "Follow MIDI programs: ") + followPrograms);
               }
               if (w == 7) help();
+              if (w == 8) startActivity(new Intent(this, AboutActivity.class));
             })
         .show();
   }

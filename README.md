@@ -2,7 +2,7 @@
 
 Aplikasi Android native untuk belajar piano di Huawei MatePad 11.5 S (TGR-W09, HarmonyOS 4.2) dengan Yamaha P-145 USB MIDI. Kelanjutan Arus Piano, dengan **package ID tetap `id.arus.piano`** dan sertifikat signing yang sama. Gratis, tanpa iklan, langganan, login wajib, atau kuota jumlah/durasi lagu.
 
-**Status: 0.2.0-beta.2.** Telah dijalankan dan diuji di emulator ARM64 Android. Belum diuji pada MatePad/P-145 fisik; latensi aktual dan kompatibilitas firmware belum diukur. Lihat [verifikasi](VERIFICATION.md) dan [batasan](docs/LIMITATIONS.md).
+**Status: 0.2.0-beta.3.** Telah dijalankan dan diuji di emulator ARM64 Android. Belum diuji pada MatePad/P-145 fisik; latensi aktual dan kompatibilitas firmware belum diukur. Lihat [verifikasi](VERIFICATION.md) dan [batasan](docs/LIMITATIONS.md).
 
 [Unduh APK resmi](https://github.com/IkhwanN-kyp/PianoFlow/releases) · [GitHub Actions](https://github.com/IkhwanN-kyp/PianoFlow/actions) · [English overview](docs/README.en.md)
 
@@ -13,7 +13,7 @@ Aplikasi Android native untuk belajar piano di Huawei MatePad 11.5 S (TGR-W09, H
 1. Dari GitHub Releases, pilih APK `PianoFlow-<versi>-arm64.apk`. APK ditujukan untuk Android ARM64, termasuk jalur APK HarmonyOS 4.2, dan tidak memerlukan Google Play Services. Bukan paket HarmonyOS NEXT/HAP.
 2. Jika sudah memakai Arus Piano 0.1.0 dari percakapan sebelumnya, **pasang menimpa aplikasi lama; jangan uninstall**. Nama berubah menjadi PianoFlow, tetapi identitas aplikasi dan signing dipertahankan. Lagu lokal, referensi file lama, preferensi, serta checkpoint latihan tetap berada dalam penyimpanan aplikasi.
 3. Izinkan pengelola berkas memasang APK bila diminta Android/HarmonyOS. Selanjutnya buka **Pengaturan > Software Update**.
-4. Pilih **Beta Release** untuk versi 0.2.0-beta.2. Kanal Stable hanya menawarkan rilis stabil yang telah diterbitkan; aplikasi tidak mengarang versi stabil atau menurunkan versi beta ke versi lama.
+4. Pilih **Beta Release** untuk versi 0.2.0-beta.3. Kanal Stable hanya menawarkan rilis stabil yang telah diterbitkan; aplikasi tidak mengarang versi stabil atau menurunkan versi beta ke versi lama.
 5. Updater menampilkan versi terpasang/terbaru, catatan rilis, ukuran APK dan progres unduhan. Pemeriksaan otomatis paling sering sekali per 24 jam; pemeriksaan manual tersedia. Tidak ada instalasi diam-diam.
 6. **Download & Install Update** mengunduh ke penyimpanan privat, memverifikasi SHA-256 dan tanda tangan APK, mencocokkan sertifikat, package ID dan nomor versi, lalu membuka installer sistem. Izinkan PianoFlow memasang pembaruan bila diminta. Sistem tetap meminta persetujuan instalasi.
 
@@ -87,3 +87,11 @@ python3 scripts/verify_vendor.py
 ```
 
 Rilis resmi dibangun/ditandatangani oleh GitHub Actions dari tag SemVer. Signing key berada di GitHub Secrets, tidak di repository. Fork harus memakai key sendiri dan mengubah pin updater; APK fork tidak dapat menggantikan APK resmi.
+
+## Bantu ASNkit terus berkembang
+
+Masukan, ide, dan kontribusi Anda membantu PianoFlow menjadi teman belajar piano yang semakin baik. Jika PianoFlow bermanfaat, Anda dapat mendukung pengembangannya melalui [Trakteer @radarswingid](https://trakteer.id/radarswingid). Dukungan Anda memberi waktu dan semangat untuk menghadirkan perbaikan serta fitur baru. Terima kasih sudah menjadi bagian dari perjalanan ASNkit.
+
+Dukungan bersifat sukarela. Seluruh fitur tetap gratis dan dapat digunakan tanpa donasi. Kredit: **ASNkit · @radarswingid**. Di aplikasi, buka **Pengaturan > Tentang aplikasi** untuk melihat versi, kode versi, tautan sumber, serta lisensi offline.
+
+PianoFlow dikembangkan secara mandiri, dengan MIDIVisualizer sebagai referensi visual, bukan fork. Daftar sumber dan kewajiban lisensi tersedia di [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md); atribusi tidak menggantikan kewajiban lisensi masing-masing komponen.

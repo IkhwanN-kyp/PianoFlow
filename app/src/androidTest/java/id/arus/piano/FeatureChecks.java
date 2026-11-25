@@ -170,8 +170,65 @@ final class FeatureChecks {
             throw new RuntimeException(e);
           }
         });
+    checkAbout(test, context);
     File future = new File(context.getFilesDir(), "update-fixture.apk");
     if (future.isFile()) verifyUpdate(test, context, future);
+  }
+
+  private static void checkAbout(SmokeInstrumentation test, Context context) {
+    for (boolean english : new boolean[] {false, true}) {
+      context
+          .getSharedPreferences("settings", 0)
+          .edit()
+          .putString("language", english ? "en" : "id")
+          .putBoolean("light", english)
+          .commit();
+      Activity about =
+          test.startActivitySync(
+              new Intent(context, AboutActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+      test.waitForIdleSync();
+      test.runOnMainSync(
+          () -> {
+            String text = allText(about.getWindow().getDecorView());
+            test.ok(
+                text.contains(BuildConfig.VERSION_NAME)
+                    && text.contains("" + BuildConfig.VERSION_CODE),
+                "About displays installed version and code");
+            test.ok(
+                text.contains("ASNkit")
+                    && text.contains("@radarswingid")
+                    && text.contains(english ? "entirely optional" : "bersifat sukarela"),
+                "About contains author credit and optional support in selected language");
+            test.ok(
+                text.contains("MIDIVisualizer")
+                    && text.contains(english ? "not a fork" : "bukan fork")
+                    && text.contains("LGPL-2.1"),
+                "About accurately attributes upstream components");
+            android.view.View decor = about.getWindow().getDecorView();
+            Bitmap bitmap =
+                Bitmap.createBitmap(decor.getWidth(), decor.getHeight(), Bitmap.Config.ARGB_8888);
+            decor.draw(new Canvas(bitmap));
+            test.ok(bitmap.getWidth() > bitmap.getHeight(), "About renders in landscape");
+            bitmap.recycle();
+            about.finish();
+          });
+    }
+    context
+        .getSharedPreferences("settings", 0)
+        .edit()
+        .putString("language", "id")
+        .putBoolean("light", false)
+        .commit();
+  }
+
+  private static String allText(android.view.View view) {
+    StringBuilder text = new StringBuilder();
+    if (view instanceof TextView) text.append(((TextView) view).getText()).append('\n');
+    if (view instanceof android.view.ViewGroup) {
+      android.view.ViewGroup group = (android.view.ViewGroup) view;
+      for (int i = 0; i < group.getChildCount(); i++) text.append(allText(group.getChildAt(i)));
+    }
+    return text.toString();
   }
 
   private static long energy(long handle, int program, int pitch, int velocity) {
