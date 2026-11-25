@@ -33,6 +33,29 @@ public final class ExtendedTests {
       near(copy.notes.get(i).start, original.notes.get(i).start, "roundtrip onset " + i);
       near(copy.notes.get(i).end, original.notes.get(i).end, "roundtrip duration " + i);
     }
+    ok(copy.tracks.size() == original.tracks.size(), "export does not add a conductor track");
+    for (int i = 0; i < copy.notes.size(); i++)
+      ok(copy.notes.get(i).track == original.notes.get(i).track, "track identity retained " + i);
+    ok(copy.tracks.equals(original.tracks), "track names retained");
+    MidiSong again = roundtrip(copy);
+    ok(
+        again.tempos.size() == copy.tempos.size() && again.meters.size() == copy.meters.size(),
+        "repeated export does not duplicate tempo/meter metadata");
+    Map<Integer, String> sparse = new TreeMap<>();
+    sparse.put(0, "Conductor");
+    sparse.put(2, "Bass hand");
+    MidiSong sparseSong =
+        new MidiSong(
+            Arrays.asList(new MidiSong.Note(48, 85, 0, 2, 0, 1)),
+            sparse,
+            0,
+            original.tempos,
+            original.meters,
+            Collections.emptyList());
+    MidiSong sparseCopy = roundtrip(sparseSong);
+    ok(
+        sparseCopy.notes.get(0).track == 2 && sparseCopy.tracks.get(2).equals("Bass hand"),
+        "empty tracks keep IDs for saved hand assignments");
     List<MidiSong.Tempo> tempos =
         Arrays.asList(new MidiSong.Tempo(0, 0, 500000), new MidiSong.Tempo(1, 2, 1000000));
     List<MidiSong.Meter> meters =

@@ -2,7 +2,7 @@
 
 Aplikasi Android native untuk belajar piano di Huawei MatePad 11.5 S (TGR-W09, HarmonyOS 4.2) dengan Yamaha P-145 USB MIDI. Kelanjutan Arus Piano, dengan **package ID tetap `id.arus.piano`** dan sertifikat signing yang sama. Gratis, tanpa iklan, langganan, login wajib, atau kuota jumlah/durasi lagu.
 
-**Status: 0.2.0-beta.1.** Telah dijalankan dan diuji di emulator ARM64 Android. Belum diuji pada MatePad/P-145 fisik; latensi aktual dan kompatibilitas firmware belum diukur. Lihat [verifikasi](VERIFICATION.md) dan [batasan](docs/LIMITATIONS.md).
+**Status: 0.2.0-beta.2.** Telah dijalankan dan diuji di emulator ARM64 Android. Belum diuji pada MatePad/P-145 fisik; latensi aktual dan kompatibilitas firmware belum diukur. Lihat [verifikasi](VERIFICATION.md) dan [batasan](docs/LIMITATIONS.md).
 
 [Unduh APK resmi](https://github.com/IkhwanN-kyp/PianoFlow/releases) · [GitHub Actions](https://github.com/IkhwanN-kyp/PianoFlow/actions) · [English overview](docs/README.en.md)
 
@@ -11,7 +11,7 @@ Aplikasi Android native untuk belajar piano di Huawei MatePad 11.5 S (TGR-W09, H
 1. Dari GitHub Releases, pilih APK `PianoFlow-<versi>-arm64.apk`. APK ditujukan untuk Android ARM64, termasuk jalur APK HarmonyOS 4.2, dan tidak memerlukan Google Play Services. Bukan paket HarmonyOS NEXT/HAP.
 2. Jika sudah memakai Arus Piano 0.1.0 dari percakapan sebelumnya, **pasang menimpa aplikasi lama; jangan uninstall**. Nama berubah menjadi PianoFlow, tetapi identitas aplikasi dan signing dipertahankan. Lagu lokal, referensi file lama, preferensi, serta checkpoint latihan tetap berada dalam penyimpanan aplikasi.
 3. Izinkan pengelola berkas memasang APK bila diminta Android/HarmonyOS. Selanjutnya buka **Pengaturan > Software Update**.
-4. Pilih **Beta Release** untuk versi 0.2.0-beta.1. Kanal Stable hanya menawarkan rilis stabil yang telah diterbitkan; aplikasi tidak mengarang versi stabil atau menurunkan versi beta ke versi lama.
+4. Pilih **Beta Release** untuk versi 0.2.0-beta.2. Kanal Stable hanya menawarkan rilis stabil yang telah diterbitkan; aplikasi tidak mengarang versi stabil atau menurunkan versi beta ke versi lama.
 5. Updater menampilkan versi terpasang/terbaru, catatan rilis, ukuran APK dan progres unduhan. Pemeriksaan otomatis paling sering sekali per 24 jam; pemeriksaan manual tersedia. Tidak ada instalasi diam-diam.
 6. **Download & Install Update** mengunduh ke penyimpanan privat, memverifikasi SHA-256 dan tanda tangan APK, mencocokkan sertifikat, package ID dan nomor versi, lalu membuka installer sistem. Izinkan PianoFlow memasang pembaruan bila diminta. Sistem tetap meminta persetujuan instalasi.
 

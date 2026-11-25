@@ -64,10 +64,14 @@ public final class MidiWriter {
       list.add(new Ev(Math.max(tick(n.beat) + 1, tick(n.endBeat)), 0x80 | n.channel, n.pitch, 0));
     }
     List<Ev> meta = new ArrayList<>();
-    for (MidiSong.Tempo t : song.tempos)
+    TreeMap<Double, MidiSong.Tempo> tempoMap = new TreeMap<>();
+    for (MidiSong.Tempo t : song.tempos) tempoMap.put(t.beat, t);
+    TreeMap<Double, MidiSong.Meter> meterMap = new TreeMap<>();
+    for (MidiSong.Meter m : song.meters) meterMap.put(m.beat, m);
+    for (MidiSong.Tempo t : tempoMap.values())
       meta.add(
           new Ev(tick(t.beat), 255, 81, 3, t.micros >> 16, (t.micros >> 8) & 255, t.micros & 255));
-    for (MidiSong.Meter m : song.meters) {
+    for (MidiSong.Meter m : meterMap.values()) {
       int power = 0;
       while ((1 << power) < m.denominator) power++;
       meta.add(new Ev(tick(m.beat), 255, 88, 4, m.numerator, power, 24, 8));
@@ -76,12 +80,29 @@ public final class MidiWriter {
       if ((m.status & 240) == 0xc0) meta.add(new Ev(tick(song.beatAt(m.time)), m.status, m.a));
       else meta.add(new Ev(tick(song.beatAt(m.time)), m.status, m.a, m.b));
     }
+    int highest = 0;
+    for (int id : song.tracks.keySet()) highest = Math.max(highest, id);
+    for (int id : tracks.keySet()) highest = Math.max(highest, id);
+    if (highest >= 65535) throw new IOException("Too many MIDI tracks");
+    tracks.computeIfAbsent(0, k -> new ArrayList<>()).addAll(0, meta);
+    for (int id = 0; id <= highest; id++) {
+      List<Ev> list = tracks.computeIfAbsent(id, k -> new ArrayList<>());
+      String name = song.tracks.getOrDefault(id, "Track " + (id + 1));
+      byte[] utf8 = name.getBytes("UTF-8");
+      ByteArrayOutputStream event = new ByteArrayOutputStream();
+      event.write(255);
+      event.write(3);
+      vlq(event, utf8.length);
+      event.write(utf8);
+      Ev named = new Ev(0);
+      named.data = event.toByteArray();
+      list.add(0, named);
+    }
     out.writeBytes("MThd");
     out.writeInt(6);
     out.writeShort(1);
-    out.writeShort(tracks.size() + 1);
+    out.writeShort(highest + 1);
     out.writeShort(480);
-    chunk(out, meta);
     for (List<Ev> list : tracks.values()) chunk(out, list);
     out.flush();
   }

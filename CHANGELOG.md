@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0-beta.2] - 2026-11-25
+
+- Preserve MIDI track IDs, empty tracks and track names when saving songs, preventing hand-role mappings from shifting after reimport.
+- Avoid duplicate tempo/meter events during repeated MIDI export.
+- Add regression checks for stable track identity and per-track learning settings.
+- Retain the same package ID, signing key and all beta.1 features; existing files remain readable.
+
 ## [0.2.0-beta.1] - 2026-11-25
 
 - Rename Arus Piano to PianoFlow while retaining package ID and signing identity.

@@ -8,3 +8,5 @@
 - **Pagar sumber daya.** MIDI 64 MiB/500.000 event, MusicXML 16 MiB, SF2 1 GiB, model resmi sekitar 200 KiB, ekspor PDF maksimum 300 halaman, hasil transkripsi 250.000 not. Tidak ada batas komersial jumlah/durasi lagu, namun memori/disk perangkat tetap terbatas. Decode audio memakai disk streaming dan dapat dibatalkan.
 - **Updater.** Memerlukan internet dan GitHub public API; rate limit, jaringan, installer OEM dan kebijakan unknown-source dapat memengaruhi proses. Tidak memasang diam-diam. Kanal Stable dapat kosong sampai ada rilis stabil. Fork dengan kunci lain ditolak. Uninstall atau clear data tetap menghapus data; update normal tidak melakukannya.
 - **UI.** Dioptimalkan landscape tablet. Pembaca layar per tuts belum diimplementasikan. UI inti dua bahasa; diagnostik OS/library bisa berbahasa Inggris. Ketahanan sesi berjam-jam dan multitouch sepuluh jari pada tablet belum diuji.
+
+- **Sesi beta.1:** jika sempat menyimpan penetapan tangan manual dari impor MIDI beta.1, periksa ulang pemetaan track pada file tersebut. Beta.2 mempertahankan nomor/nama track saat penyimpanan dan mencegah pergeseran pada impor baru. File dan preferensi lama tidak dihapus.

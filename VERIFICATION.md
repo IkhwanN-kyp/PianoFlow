@@ -1,11 +1,15 @@
-# Verifikasi PianoFlow 0.2.0-beta.1
+# Verifikasi PianoFlow 0.2.0-beta.2
 
 Diperiksa 25 November 2026 (Asia/Jakarta). Hasil kompilasi, emulator dan hardware dipisahkan.
+
+## Distribusi dan perbaikan penyimpanan
+
+Pipeline beta.1 sudah berhasil membangun, menguji, menandatangani dan memublikasikan APK: https://github.com/IkhwanN-kyp/PianoFlow/actions/runs/45603260090 . Beta.2 mempertahankan ID/nama/track kosong saat ekspor sehingga penetapan tangan tidak bergeser pada impor baru; regresi metadata dan track ditambahkan. File beta.1 tetap dapat dibaca.
 
 ## Bukti yang sudah ada
 
 - JDK 17, Gradle 8.10.2, AGP 8.7.3, SDK/build-tools 35, NDK 27.2.12479018 dan CMake 3.22.1; build native ARM64 serta Android lint berhasil.
-- Core: **43 assertion + 300 mutasi MIDI rusak**, ditambah **83 pemeriksaan** export MIDI, tempo/meter, MusicXML/XXE, grid partitur, GM, MIDI CC dan SemVer.
+- Core: **43 assertion + 300 mutasi MIDI rusak**, ditambah **110 pemeriksaan** export MIDI, tempo/meter, MusicXML/XXE, grid partitur, GM, MIDI CC dan SemVer.
 - Emulator Android 11/API 30 ARM64, landscape 1400 × 920 (rasio 2800 × 1840), tanpa Google Play Services: **171 pemeriksaan runtime** lolos pada tahap integrasi, kemudian **177 pemeriksaan** setelah menambahkan tes keamanan updater.
 - Termasuk fitur latihan lama, audio FluidSynth/AudioTrack, 128 preset GM yang benar-benar menghasilkan sampel audio, amplitudo velocity, sustain down/up, WAV decode/resample dan deteksi akor C–E–G melalui Basic Pitch.
 - Decoder MP3, WAV, M4A dan FLAC diuji dengan akor sintetis asli, bukan lagu komersial. M4A dibuat dengan AAC encoder Android; MP3/FLAC berasal dari fixture asli yang sama.

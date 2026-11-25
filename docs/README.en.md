@@ -1,6 +1,6 @@
 # PianoFlow — English overview
 
-Native Android piano practice, continuing Arus Piano with the same application ID (`id.arus.piano`) and signing certificate. Free of ads, subscriptions, mandatory accounts and commercial song-import quotas. Release 0.2.0-beta.1 is intended for personal testing.
+Native Android piano practice, continuing Arus Piano with the same application ID (`id.arus.piano`) and signing certificate. Free of ads, subscriptions, mandatory accounts and commercial song-import quotas. Release 0.2.0-beta.2 is intended for personal testing.
 
 Download the ARM64 APK from [official Releases](https://github.com/IkhwanN-kyp/PianoFlow/releases). Install over the old app to retain its data; do not uninstall. For future versions use Settings > Software Update, select Stable/Beta, and choose Download & Install Update. APK SHA-256, cryptographic signature, certificate, package ID and increasing version are checked before the Android system installer. Google Play Services are not used.
 
