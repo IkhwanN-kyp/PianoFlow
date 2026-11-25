@@ -10,6 +10,8 @@ Diperiksa 26 November 2026 (Asia/Jakarta). Hasil kompilasi, emulator dan hardwar
 - Bantuan bertopik diuji dalam Indonesia/tema gelap dan English/tema terang. Tentang memuat versi/kode, informasi fitur, panduan, kredit dan lisensi yang tetap tersedia.
 - Belum diuji dengan MatePad/P-145 fisik; latensi USB dan audio tidak diukur. Animasi mengikuti penekanan fisik tuts, bukan lamanya decay suara setelah sustain.
 
+Rilis resmi beta.5 berhasil melewati kedua job test/release di https://github.com/IkhwanN-kyp/PianoFlow/actions/runs/45716349721 . CI Android tanpa Google Play Services lulus 200 pemeriksaan runtime dan 391 pemeriksaan live-learning; tujuh fixture privat menambah pemeriksaan lokal ARM64 menjadi 207. APK resmi dipasang menimpa versi emulator dan kembali lulus 207 pemeriksaan, termasuk marker data lama yang tetap terbaca. Package `id.arus.piano`, versi `0.2.0-beta.5`, kode `2002005`, non-debuggable, sertifikat tetap sama. Ukuran 27.171.832 byte; SHA-256 `db5f0bc0a95454f31cc21afb748f2a867d35dc89b7b97ec0ae525c4a69ee9dbd` dicocokkan dengan manifest dan signature APK diverifikasi setelah unduhan.
+
 ![Bermain bebas](docs/screenshots/freeplay-solfege.png)
 ![Panduan offline](docs/screenshots/help-freeplay.png)
 
