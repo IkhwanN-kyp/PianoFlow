@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.22.1)
+project(pianoflow LANGUAGES CXX)
+add_library(fluidsynth SHARED IMPORTED)
+set_target_properties(fluidsynth PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/../jniLibs/${ANDROID_ABI}/libfluidsynth.so)
+add_library(pianoflow SHARED audio.cpp)
+target_include_directories(pianoflow PRIVATE include)
+target_link_libraries(pianoflow fluidsynth log)
+target_link_options(pianoflow PRIVATE "-Wl,-z,max-page-size=16384")

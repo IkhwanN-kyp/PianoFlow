@@ -1,0 +1,44 @@
+plugins { id 'com.android.application' }
+def releaseVersion = providers.gradleProperty('releaseVersion').getOrElse(rootProject.file('VERSION').text.trim())
+def versionMatch = releaseVersion =~ /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-(alpha|beta|rc)\.(0|[1-9][0-9]*))?$/
+if (!versionMatch.matches()) throw new GradleException('Invalid release SemVer')
+def stage = [alpha:1000,beta:2000,rc:3000][versionMatch.group(4)] ?: 9000
+def calculatedCode = versionMatch.group(1).toLong()*100000000 + versionMatch.group(2).toInteger()*1000000 + versionMatch.group(3).toInteger()*10000 + stage + (versionMatch.group(5) ?: '0').toInteger()
+if(calculatedCode>2100000000) throw new GradleException('Version code exceeds Android limit')
+def releaseCode = providers.gradleProperty('releaseCode').getOrElse(calculatedCode.toString()).toInteger()
+android {
+    namespace 'id.arus.piano'
+    compileSdk 35
+    buildToolsVersion '35.0.0'
+    ndkVersion '27.2.12479018'
+    defaultConfig {
+        applicationId 'id.arus.piano'
+        minSdk 24
+        targetSdk 35
+        versionCode releaseCode
+        versionName releaseVersion
+        ndk { abiFilters providers.gradleProperty('targetAbi').getOrElse('arm64-v8a') }
+        externalNativeBuild { cmake { cppFlags '-std=c++17'; arguments '-DANDROID_STL=c++_shared' } }
+        testInstrumentationRunner 'id.arus.piano.SmokeInstrumentation'
+        buildConfigField 'String', 'UPDATE_REPOSITORY', '"IkhwanN-kyp/PianoFlow"'
+    }
+    buildFeatures { buildConfig true }
+    externalNativeBuild { cmake { path 'src/main/cpp/CMakeLists.txt'; version '3.22.1' } }
+    signingConfigs {
+        release {
+            if(System.getenv('PIANOFLOW_KEYSTORE')) {
+                storeFile file(System.getenv('PIANOFLOW_KEYSTORE'))
+                storePassword System.getenv('PIANOFLOW_STORE_PASSWORD')
+                keyAlias System.getenv('PIANOFLOW_KEY_ALIAS')
+                keyPassword System.getenv('PIANOFLOW_KEY_PASSWORD')
+            }
+        }
+    }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_1_8; targetCompatibility JavaVersion.VERSION_1_8 }
+    buildTypes { release { minifyEnabled false; signingConfig signingConfigs.release } }
+    packaging { jniLibs { useLegacyPackaging false; keepDebugSymbols += ['**/*.so'] } }
+}
+dependencies {
+    implementation 'org.tensorflow:tensorflow-lite:2.16.1'
+    implementation 'com.android.tools.build:apksig:8.7.3'
+}

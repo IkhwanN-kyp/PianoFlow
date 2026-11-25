@@ -1,0 +1,117 @@
+[
+  {
+    "path": "app/src/main/jniLibs/arm64-v8a/libFLAC.so",
+    "sha256": "53933fd804c9829ed0d72ff4c858532c1345ce62de8f41d0efdf327904239b86",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/arm64-v8a/libfluidsynth-assetloader.so",
+    "sha256": "15a44d3c4b5226e378a6fa5e32bba908f2236080e52991190108dd3c74d71a6e",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/arm64-v8a/libfluidsynth.so",
+    "sha256": "8b509042d1456c126894ccb43617b6184e1008b0c4917a315add51d1abcd065a",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/arm64-v8a/liboboe.so",
+    "sha256": "75ca28b01d231b3ebbf959c07d128f5fe4ebf0461306b16ab5e25b2d70025d26",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/arm64-v8a/libogg.so",
+    "sha256": "e31ed51fa37adc8b52f2bcccac2ccc7853315437e03a0f801fda52097540da4e",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/arm64-v8a/libopus.so",
+    "sha256": "ba6e53fd64bda9d2bdc3b50d80e9f82618fb57d33cfa2d1edd8816240e16ee03",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/arm64-v8a/libsndfile.so",
+    "sha256": "dd11b3f745fe32eccb94710b42d5a084bb39e0dd67763f29c543c91cedad47a6",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/arm64-v8a/libvorbis.so",
+    "sha256": "22c79107b0149f74ce4fbc901f66f557ec2f6882abfc35e0c28198875f4a4114",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/arm64-v8a/libvorbisenc.so",
+    "sha256": "832989236eec7643b533250a6498b0c12794107e22527e30fbd3448f13463f6b",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/arm64-v8a/libvorbisfile.so",
+    "sha256": "caf233026166d18d39c0e9b155dda62bb172ad8d9b2c635e0357225f9674104d",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/x86_64/libFLAC.so",
+    "sha256": "3a5020078b86b1f418b9ddc3bf1545a5183ea9daa2c95dfa8837ef07a8418f1e",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/x86_64/libfluidsynth-assetloader.so",
+    "sha256": "c2d56824b6e25357b002c9a97e2a953fd1ae3e1d5f76613c5ba117ce59481236",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/x86_64/libfluidsynth.so",
+    "sha256": "397e42618122b12af74a9ddf47b983aee91000f9cbf16454849c9da07bdd20f2",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/x86_64/liboboe.so",
+    "sha256": "9f48ab410469ae0e8fdfd9612f986fbeaeb71409b24c784b2f72543a4692af19",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/x86_64/libogg.so",
+    "sha256": "a765c00774242c604f1c1a106edc0d07529fe978ad631172fa4aa89b776cc0d5",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/x86_64/libopus.so",
+    "sha256": "e1d0599c761f463151d7a3af7be71e0bce5dcafb7a5131094b113330cddb69aa",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/x86_64/libsndfile.so",
+    "sha256": "89bc4d1ac1e42a31bc36dbb4bd3cc9c0d2d2f0ed28aa2c80aff0bd655dddd381",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/x86_64/libvorbis.so",
+    "sha256": "3735eb016c38d2feeb613a99e7ca24fe3d2167d3df653d8f510cccbca167ca70",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/x86_64/libvorbisenc.so",
+    "sha256": "e6b91fc30ba8fef88dea7c8409617b27138e41bf1d491b2e3133771ee207de57",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/jniLibs/x86_64/libvorbisfile.so",
+    "sha256": "610b60bcc9608c0a35736cd2a8ba875891f666b01e45d403d9914d0112d28ae7",
+    "upstream": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-android24.zip"
+  },
+  {
+    "path": "app/src/main/assets/soundfonts/TimGM6mb.sf2",
+    "sha256": "c5378b62028c920cb11e4803327983fee2f2cdff5dc89c708e39da417e51c854",
+    "upstream": "https://github.com/arbruijn/TimGM6mb"
+  },
+  {
+    "path": "app/src/main/assets/fonts/Bravura.otf",
+    "sha256": "cdf0f893ee1fdb64b7f6713d71ee0dcfc349c0ac01429a8e451b01a9e79f5f3b",
+    "upstream": "https://github.com/steinbergmedia/bravura"
+  },
+  {
+    "path": "modules/basic-pitch.tflite",
+    "sha256": "3db297d54af8e01c6e5618245c956b1d71b6a2b978cb2dedb527173186552676",
+    "upstream": "https://github.com/spotify/basic-pitch/blob/main/basic_pitch/saved_models/icassp_2022/nmp.tflite"
+  }
+]

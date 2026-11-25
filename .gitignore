@@ -1,0 +1,17 @@
+.gradle/
+**/build/
+local.properties
+*.jks
+.DS_Store
+.cxx/
+**/.cxx/
+*.keystore
+*.p12
+*.pem
+*.key
+signing*.json
+secrets*
+*.apk
+*.aab
+dist/
+verification/*.log

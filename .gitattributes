@@ -1,0 +1,13 @@
+* text=auto
+*.bat text eol=crlf
+*.sh text eol=lf
+*.so binary
+*.sf2 binary
+*.tflite binary
+*.otf binary
+*.jar binary
+*.tar.gz binary
+*.tar.xz binary
+*.wav binary
+*.flac binary
+*.mp3 binary
