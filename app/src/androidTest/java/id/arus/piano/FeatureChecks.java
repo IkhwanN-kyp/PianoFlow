@@ -170,7 +170,7 @@ final class FeatureChecks {
             throw new RuntimeException(e);
           }
         });
-    File future = new File(context.getCacheDir(), "update-fixture.apk");
+    File future = new File(context.getFilesDir(), "update-fixture.apk");
     if (future.isFile()) verifyUpdate(test, context, future);
   }
 
@@ -274,10 +274,34 @@ final class FeatureChecks {
       rejected = true;
     }
     test.ok(rejected, "APK version metadata mismatch rejected");
-    UpdateClient.Release self=new UpdateClient.Release();self.version=context.getPackageManager().getPackageInfo(context.getPackageName(),0).versionName;self.code=UpdateClient.installedCode(context);File current=new File(context.getApplicationInfo().sourceDir);self.sha=UpdateClient.sha256(current);rejected=false;try{UpdateClient.verify(context,current,self);}catch(SecurityException e){rejected=true;}test.ok(rejected,"same-version/downgrade APK rejected");
-    for(String name:new String[]{"wrong-signer.apk","bad-signature.apk"}) {
-      File fixture=new File(context.getCacheDir(),name);if(fixture.isFile()) {release.code=android.os.Build.VERSION.SDK_INT>=28?info.getLongVersionCode():info.versionCode;release.sha=UpdateClient.sha256(fixture);boolean denied=false;try{UpdateClient.verify(context,fixture,release);}catch(SecurityException e){denied=true;}test.ok(denied,"cryptographic verification rejects "+name+" even when checksum matches");}
+    UpdateClient.Release self = new UpdateClient.Release();
+    self.version =
+        context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+    self.code = UpdateClient.installedCode(context);
+    File current = new File(context.getApplicationInfo().sourceDir);
+    self.sha = UpdateClient.sha256(current);
+    rejected = false;
+    try {
+      UpdateClient.verify(context, current, self);
+    } catch (SecurityException e) {
+      rejected = true;
     }
-
+    test.ok(rejected, "same-version/downgrade APK rejected");
+    for (String name : new String[] {"wrong-signer.apk", "bad-signature.apk"}) {
+      File fixture = new File(context.getFilesDir(), name);
+      if (fixture.isFile()) {
+        release.code =
+            android.os.Build.VERSION.SDK_INT >= 28 ? info.getLongVersionCode() : info.versionCode;
+        release.sha = UpdateClient.sha256(fixture);
+        boolean denied = false;
+        try {
+          UpdateClient.verify(context, fixture, release);
+        } catch (SecurityException e) {
+          denied = true;
+        }
+        test.ok(
+            denied, "cryptographic verification rejects " + name + " even when checksum matches");
+      }
+    }
   }
 }
