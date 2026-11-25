@@ -20,7 +20,13 @@ Pipeline beta.1 sudah berhasil membangun, menguji, menandatangani dan memublikas
 
 Tambahan enam tes updater memakai APK bertanda tangan asli dengan versi lebih tinggi, checksum keliru, metadata versi keliru, APK versi sama/downgrade, APK dengan signer lain, serta APK yang payload-nya dirusak meskipun checksum metadata disesuaikan. APK resmi diterima; kelima kasus penolakan lolos. APK fixture hanya dipakai di emulator, tidak dipublikasikan sebagai versi produk.
 
-Log dan hasil akhir pipeline/rilis ditambahkan pada bagian status distribusi setelah dijalankan. Tidak menganggap konfigurasi workflow yang belum dijalankan sebagai pipeline yang telah lolos.
+## Hasil distribusi resmi
+
+- Beta.2 berhasil dibangun, diuji, ditandatangani dan dipublikasikan otomatis: https://github.com/IkhwanN-kyp/PianoFlow/actions/runs/45605672941 . Kedua job test dan release berstatus success. Rilis: https://github.com/IkhwanN-kyp/PianoFlow/releases/tag/v0.2.0-beta.2 .
+- SHA-256 APK resmi: `9e3dabae06f0b3a2f0ce5bfcb8b2fbe18563be249d04f9433bd681ed160d275e`; 27.154.617 byte; package `id.arus.piano`; versionCode `2002002`; APK Signature Scheme v2 valid, sertifikat sama dan non-debuggable.
+- Aplikasi beta.1 resmi berhasil membaca beta.2 melalui GitHub Releases API dan menampilkan versi terpasang/terbaru, ukuran 25,90 MiB, kanal Beta serta changelog yang benar. Uji end-to-end selesai 26 November 2026: unduhan, verifikasi, izin unknown-source, dialog konfirmasi Android dan instalasi beta.1 → beta.2 berhasil. PackageManager menunjukkan versionName `0.2.0-beta.2` dan versionCode `2002002` setelah instalasi tanpa uninstall. Perpustakaan masih menampilkan `converted.mid` dan lagu impor sebelumnya. Tab Konversi juga tetap menampilkan `Basic Pitch · model siap` setelah update.
+- Alur UI konversi diuji secara manual: impor model resmi dari Downloads, pilih WAV asli, jalankan Basic Pitch, buka editor not, hapus satu not estimasi, dan Masuk latihan. Hasil terkoreksi benar-benar muncul di latihan/perpustakaan.
+- Catatan rilis diperbaiki dan ditambah regresi parser batas bagian changelog. Ini perubahan tooling/metadata; tidak mengubah APK yang sudah diterbitkan.
 
 ## Belum dibuktikan oleh emulator
 

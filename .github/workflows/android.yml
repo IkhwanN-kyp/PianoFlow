@@ -32,6 +32,7 @@ jobs:
           python3 scripts/check_repository.py
           python3 scripts/verify_vendor.py
           ./test-core.sh
+          python3 scripts/test_release_tools.py
       - name: Build and lint x86_64 runtime test APK
         run: |
           chmod +x gradlew test-core.sh

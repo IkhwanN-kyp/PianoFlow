@@ -6,6 +6,8 @@ Aplikasi Android native untuk belajar piano di Huawei MatePad 11.5 S (TGR-W09, H
 
 [Unduh APK resmi](https://github.com/IkhwanN-kyp/PianoFlow/releases) · [GitHub Actions](https://github.com/IkhwanN-kyp/PianoFlow/actions) · [English overview](docs/README.en.md)
 
+![PianoFlow hybrid view](docs/screenshots/hybrid-dark.png)
+
 ## Instalasi dan pembaruan
 
 1. Dari GitHub Releases, pilih APK `PianoFlow-<versi>-arm64.apk`. APK ditujukan untuk Android ARM64, termasuk jalur APK HarmonyOS 4.2, dan tidak memerlukan Google Play Services. Bukan paket HarmonyOS NEXT/HAP.
