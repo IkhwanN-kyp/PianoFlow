@@ -1,6 +1,13 @@
-# Verifikasi PianoFlow 0.2.0-beta.5
+# Verifikasi PianoFlow 0.2.0-beta.6
 
 Diperiksa 26 November 2026 (Asia/Jakarta). Hasil kompilasi, emulator dan hardware dipisahkan.
+
+## Bagian instrumen dan pengiring beta.6
+
+- 43 assertion parser/trainer + 300 mutasi MIDI, 110 pemeriksaan extended, dan 391 pemeriksaan live-learning tetap lolos. Tambahan 40 pemeriksaan aransemen mencakup grouping track/channel, GM, pemilihan learner/backing/mute, penilaian/tampilan, wait/tempo, sustain, seek/loop, volume, solo, unison/overlap, dan roundtrip provenance pesan MIDI.
+- Build ARM64 dan lint berhasil; **223 pemeriksaan runtime emulator Android ARM64** lolos. Pengujian Android mencakup impor MIDI asli piano kiri/kanan + gitar, pemutaran gitar pada latihan tanpa auto-play piano, preview part yang di-mute menggunakan AudioTrack native, kontrol peran nyata, pengubahan volume lewat sentuhan, serta pemulihan konfigurasi per lagu saat kembali ke latihan.
+- Dua track belajar yang memainkan pitch/onset sama dipenuhi satu penekanan; Note Off satu part tidak memutus unison part lain. Pilihan suara pemain tidak mengubah program GM pengiring tablet. Program/pedal/bend tetap state channel bersama; instrumen yang tercampur dalam satu track/channel tidak ditebak terpisah. Perkusi channel 10 masih dilewati.
+- Bank dan sumber vendor tetap dipin; tidak ada lagu komersial baru. `samples/duet-asli.mid` adalah lima not orisinal yang dihasilkan oleh tes. Pengujian fisik MatePad/P-145, dukungan suara GM perangkat MIDI OUT, dan latensi USB/audio tetap belum dilakukan.
 
 ## Bermain bebas, label, dan panduan beta.5
 

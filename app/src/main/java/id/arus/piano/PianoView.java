@@ -207,7 +207,8 @@ public final class PianoView extends View {
       int first = prefixLower(trainer.time - .5);
       for (int i = first; i < end; i++) {
         MidiSong.Note n = trainer.song.notes.get(i);
-        if (n.pitch < 21 || n.pitch > 108 || n.end < trainer.time - .5) continue;
+        if (n.pitch < 21 || n.pitch > 108 || n.end < trainer.time - .5 || !trainer.visible(n))
+          continue;
         RectF k = keys[n.pitch];
         int role = trainer.role(n), col = role == 1 ? blue : mint;
         if (!trainer.selected(n)) col = 0xff3c4962;

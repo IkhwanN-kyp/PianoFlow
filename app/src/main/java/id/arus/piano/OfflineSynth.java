@@ -77,7 +77,7 @@ public final class OfflineSynth implements AutoCloseable {
 
   public synchronized void program(int p) {
     program = Math.max(0, Math.min(127, p));
-    for (int ch = 0; ch < 48; ch++)
+    for (int ch = 0; ch < 32; ch++)
       if (ch % 16 != 9) FluidNative.message(handle, 0xc000 | ch, program, 0);
   }
 

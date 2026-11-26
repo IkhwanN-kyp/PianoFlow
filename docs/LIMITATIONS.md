@@ -10,3 +10,5 @@
 - **UI.** Dioptimalkan landscape tablet. Pembaca layar per tuts belum diimplementasikan. UI inti dua bahasa; diagnostik OS/library bisa berbahasa Inggris. Ketahanan sesi berjam-jam dan multitouch sepuluh jari pada tablet belum diuji.
 
 - **Sesi beta.1:** jika sempat menyimpan penetapan tangan manual dari impor MIDI beta.1, periksa ulang pemetaan track pada file tersebut. Beta.2 mempertahankan nomor/nama track saat penyimpanan dan mencegah pergeseran pada impor baru. File dan preferensi lama tidak dihapus.
+
+- **Bagian/pengiring.** Bagian dipisah berdasarkan track + channel, bukan stem separation atau tebakan instrumen dalam satu channel. Track yang berbagi channel tetap berbagi program/bank, pedal dan pitch bend, serta suara unison ditahan sampai Note Off terakhir. Perkusi channel 10 tetap dilewati. Identifikasi instrumen memakai GM; nama SF2 kustom bisa berbeda. Pengiring berhenti maju saat mode Tunggu, tetapi envelope/reverb suara aktif dapat meluruh alami. MIDI OUT memakai channel asli dan bergantung kemampuan perangkat; gunakan tablet untuk bank GM yang disertakan.

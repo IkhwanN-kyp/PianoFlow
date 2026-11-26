@@ -11,9 +11,12 @@ public final class HelpActivity extends Activity {
   private LinearLayout content, navigation;
   private ScrollView article;
   private final String[][] titles = {
-    {"Mulai di sini", "Getting started"}, {"Bermain bebas & label", "Free play & labels"},
-    {"Sambungan MIDI / USB", "MIDI / USB connection"}, {"Latihan lagu", "Song practice"},
-    {"Suara & sustain", "Sound & sustain"}, {"Konversi audio", "Audio conversion"},
+    {"Mulai di sini", "Getting started"},
+    {"Bermain bebas & label", "Free play & labels"},
+    {"Sambungan MIDI / USB", "MIDI / USB connection"},
+    {"Latihan lagu", "Song practice"},
+    {"Suara & sustain", "Sound & sustain"},
+    {"Konversi audio", "Audio conversion"},
     {"Partitur & PDF", "Sheet music & PDF"},
     {"Pembaruan & pemecahan masalah", "Updates & troubleshooting"}
   };
@@ -124,6 +127,50 @@ public final class HelpActivity extends Activity {
         "Practice scores your input. The Practice / Listen button switches between scoring and MIDI"
             + " playback. Wait ON pauses time until the whole chord is played; OFF scores note"
             + " starts within ±180 ms of song time."
+      },
+      {
+        "Piano dengan gitar atau instrumen lain",
+        "Piano with guitar or other instruments",
+        "Setelah impor, buka Bagian & pengiring. Pilih Saya mainkan, Pengiring otomatis, atau"
+            + " Matikan untuk setiap track/channel. Atur tangan dan volume per bagian. Dengarkan"
+            + " mengisolasi satu bagian hingga 12 detik, termasuk bagian yang sedang dimatikan."
+            + " Volume pengiring mengatur keseimbangan keseluruhan. Pilihan disimpan per lagu."
+            + " Perubahan peran/tangan mengulang penilaian pada posisi yang sama; perubahan volume"
+            + " tidak menghapus skor.",
+        "After import, open Parts & backing. Choose I play, Automatic backing or Mute for each"
+            + " track/channel. Assign hands and levels per part. Listen isolates one part for up to"
+            + " 12 seconds, including muted parts. Backing level controls the overall balance."
+            + " Choices are saved per song. Role/hand changes restart scoring at the same position;"
+            + " level changes preserve scores."
+      },
+      {
+        "Apa yang dinilai dan terdengar",
+        "What is scored and sounded",
+        "Latihan hanya menilai dan menampilkan bagian Saya mainkan. Pengiring diputar otomatis"
+            + " dengan program General MIDI berkas. Dengarkan memutar semua bagian kecuali Matikan."
+            + " Mode Tunggu menahan jam pengiring; bunyi yang sudah aktif dapat meluruh alami."
+            + " Tempo, jeda, seek, dan loop mengikuti posisi lagu yang sama. Untuk banyak jenis"
+            + " instrumen, suara tablet memakai SoundFont; MIDI OUT bergantung pada kemampuan"
+            + " perangkat tujuan.",
+        "Practice scores and displays only I play parts. Backing plays automatically with the"
+            + " file’s General MIDI programs. Listen plays all parts except Mute. Wait holds the"
+            + " backing clock; active sounds may decay naturally. Tempo, pause, seek and loops"
+            + " share one song position. Tablet sound uses a SoundFont; MIDI OUT depends on the"
+            + " receiving device’s instrument support."
+      },
+      {
+        "Batas pemisahan instrumen",
+        "Instrument separation limits",
+        "Satu track dengan channel berbeda dapat dipisahkan. Track yang berbagi channel tetap"
+            + " berbagi program, sustain, dan pitch bend. Aplikasi tidak menebak pemisahan"
+            + " instrumen yang sudah tercampur pada satu track/channel. Ekspor ulang dari MuseScore"
+            + " dengan channel terpisah bila perlu. Tanpa program MIDI, suara default adalah piano."
+            + " Perkusi channel 10 masih dilewati pada impor.",
+        "Different channels in one track can be separated. Tracks sharing a channel still share"
+            + " program, sustain and pitch bend. The app does not guess how to separate instruments"
+            + " already mixed in one track/channel. Re-export from MuseScore with separate channels"
+            + " when needed. Without a MIDI program, the default sound is piano. Channel-10"
+            + " percussion is still skipped on import."
       },
       {
         "Tempo, tangan, dan loop",

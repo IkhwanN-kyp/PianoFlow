@@ -10,6 +10,7 @@
   <activity android:name=".SoftwareUpdateActivity" android:exported="false" android:screenOrientation="sensorLandscape" android:configChanges="keyboardHidden|orientation|screenSize" android:launchMode="singleTop"/>
   <activity android:name=".AboutActivity" android:exported="false" android:screenOrientation="sensorLandscape" android:configChanges="keyboardHidden|orientation|screenSize"/>
   <activity android:name=".HelpActivity" android:exported="false" android:screenOrientation="sensorLandscape" android:configChanges="keyboardHidden|orientation|screenSize"/>
+  <activity android:name=".PartsActivity" android:exported="false" android:screenOrientation="sensorLandscape" android:configChanges="keyboardHidden|orientation|screenSize"/>
   <receiver android:name=".InstallResultReceiver" android:exported="false"/>
  </application>
 </manifest>

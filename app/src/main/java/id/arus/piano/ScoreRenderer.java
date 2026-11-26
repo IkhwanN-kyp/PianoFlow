@@ -115,7 +115,7 @@ final class ScoreRenderer {
         stop = trainer.lower(song.secondsAt(end) - .00001);
     for (int i = startIndex; i < stop && i < song.notes.size(); i++) {
       MidiSong.Note n = song.notes.get(i);
-      if (n.pitch < 21 || n.pitch > 108 || trainer.role(n) == 3) continue;
+      if (n.pitch < 21 || n.pitch > 108 || !trainer.visible(n)) continue;
       double b = ScoreLayout.quantize(n.beat);
       if (b < first.beat || b >= end) b = n.beat;
       int bar = b < second.beat ? 0 : 1;

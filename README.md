@@ -2,7 +2,7 @@
 
 Aplikasi Android native untuk belajar piano di Huawei MatePad 11.5 S (TGR-W09, HarmonyOS 4.2) dengan Yamaha P-145 USB MIDI. Kelanjutan Arus Piano, dengan **package ID tetap `id.arus.piano`** dan sertifikat signing yang sama. Gratis, tanpa iklan, langganan, login wajib, atau kuota jumlah/durasi lagu.
 
-**Status: 0.2.0-beta.5.** Telah dijalankan dan diuji di emulator ARM64 Android. Belum diuji pada MatePad/P-145 fisik; latensi aktual dan kompatibilitas firmware belum diukur. Lihat [verifikasi](VERIFICATION.md) dan [batasan](docs/LIMITATIONS.md).
+**Status: 0.2.0-beta.6.** Telah dijalankan dan diuji di emulator ARM64 Android. Belum diuji pada MatePad/P-145 fisik; latensi aktual dan kompatibilitas firmware belum diukur. Lihat [verifikasi](VERIFICATION.md) dan [batasan](docs/LIMITATIONS.md).
 
 [Unduh APK resmi](https://github.com/IkhwanN-kyp/PianoFlow/releases) · [GitHub Actions](https://github.com/IkhwanN-kyp/PianoFlow/actions) · [English overview](docs/README.en.md)
 
@@ -13,11 +13,25 @@ Aplikasi Android native untuk belajar piano di Huawei MatePad 11.5 S (TGR-W09, H
 1. Dari GitHub Releases, pilih APK `PianoFlow-<versi>-arm64.apk`. APK ditujukan untuk Android ARM64, termasuk jalur APK HarmonyOS 4.2, dan tidak memerlukan Google Play Services. Bukan paket HarmonyOS NEXT/HAP.
 2. Jika sudah memakai Arus Piano 0.1.0 dari percakapan sebelumnya, **pasang menimpa aplikasi lama; jangan uninstall**. Nama berubah menjadi PianoFlow, tetapi identitas aplikasi dan signing dipertahankan. Lagu lokal, referensi file lama, preferensi, serta checkpoint latihan tetap berada dalam penyimpanan aplikasi.
 3. Izinkan pengelola berkas memasang APK bila diminta Android/HarmonyOS. Selanjutnya buka **Pengaturan > Software Update**.
-4. Pilih **Beta Release** untuk versi 0.2.0-beta.5. Kanal Stable hanya menawarkan rilis stabil yang telah diterbitkan; aplikasi tidak mengarang versi stabil atau menurunkan versi beta ke versi lama.
+4. Pilih **Beta Release** untuk versi 0.2.0-beta.6. Kanal Stable hanya menawarkan rilis stabil yang telah diterbitkan; aplikasi tidak mengarang versi stabil atau menurunkan versi beta ke versi lama.
 5. Updater menampilkan versi terpasang/terbaru, catatan rilis, ukuran APK dan progres unduhan. Pemeriksaan otomatis paling sering sekali per 24 jam; pemeriksaan manual tersedia. Tidak ada instalasi diam-diam.
 6. **Download & Install Update** mengunduh ke penyimpanan privat, memverifikasi SHA-256 dan tanda tangan APK, mencocokkan sertifikat, package ID dan nomor versi, lalu membuka installer sistem. Izinkan PianoFlow memasang pembaruan bila diminta. Sistem tetap meminta persetujuan instalasi.
 
 Jika versi dengan tanda tangan lain sudah terpasang, updater menolak APK tersebut. Jangan menghapus aplikasi untuk mengatasi masalah ini jika datanya masih diperlukan; periksa sumber APK dan signing terlebih dahulu. Keamanan/distribusi dijelaskan di [UPDATES.md](docs/UPDATES.md).
+
+## Latihan piano dengan pengiring gitar atau instrumen lain
+
+1. Impor MIDI dari MuseScore atau sumber yang Anda boleh gunakan, lalu buka **Bagian & pengiring** pada baris atas. Bagian dibaca per **track + channel**, sehingga satu track multi-channel juga bisa dipilih terpisah. Nama track, program General MIDI, channel, serta jumlah not ditampilkan.
+2. Pilih **Saya mainkan**, **Pengiring otomatis**, atau **Matikan** untuk setiap bagian. Jika piano dan instrumen lain terdeteksi dari program GM, piano disarankan untuk dimainkan dan instrumen lainnya menjadi pengiring. Jika semua bagian non-piano atau program tidak tersedia, tentukan pilihan sendiri. Dua track piano dapat dipakai untuk tangan kiri/kanan.
+3. Atur **tangan** dan **volume per bagian**, lalu gunakan **Volume pengiring** untuk keseimbangan keseluruhan. **Dengarkan** mengisolasi satu bagian hingga 12 detik, dimulai dekat nada pertamanya, termasuk bagian yang sedang dimatikan. Preview menggunakan volume bagian dan suara tablet offline.
+4. Kembali ke **Latihan** lalu tekan Mulai. Hanya bagian Saya mainkan yang ditampilkan dan dinilai. Pengiring berbunyi otomatis, mengikuti tempo, Tunggu, jeda, seek, serta loop yang sama. Suara yang sudah aktif dapat meluruh alami ketika jam lagu menunggu. **Dengarkan** pada layar latihan memutar semua bagian kecuali Matikan.
+5. Pengaturan disimpan per lagu. Perubahan peran/tangan mengulang penilaian pada posisi yang sama; perubahan volume mempertahankan skor. Gunakan **Audio: ON / tablet** untuk suara GM dari SoundFont. MIDI OUT mempertahankan channel berkas dan memerlukan dukungan instrumen pada perangkat tujuan; P-145 tidak otomatis memiliki semua suara GM.
+
+Track yang berbagi channel juga berbagi program, pedal, dan pitch bend. Instrumen yang sudah tercampur dalam satu track/channel tidak dipisahkan secara tebakan; ekspor ulang dari MuseScore dengan channel terpisah bila perlu. Nama instrumen mengikuti GM; SoundFont kustom bisa berbeda. Impor perkusi channel 10 masih dilewati.
+
+Contoh asli bebas lagu komersial: [duet-asli.mid](samples/duet-asli.mid), lima not latihan piano + gitar yang dibuat khusus untuk proyek ini.
+
+![Bagian piano dan pengiring gitar](docs/screenshots/parts-backing.png)
 
 ## Bermain bebas dan label tuts
 

@@ -49,9 +49,14 @@ public final class MidiSong {
 
   public static final class Message {
     public final double time;
-    public final int status, a, b;
+    public final int status, a, b, track;
 
     public Message(double time, int status, int a, int b) {
+      this(time, status, a, b, -1);
+    }
+
+    public Message(double time, int status, int a, int b, int track) {
+      this.track = track;
       this.time = time;
       this.status = status;
       this.a = a;
@@ -293,7 +298,7 @@ public final class MidiSong {
         continue;
       }
       if (e.kind == 0xb0 || e.kind == 0xc0 || e.kind == 0xe0)
-        messages.add(new Message(time, e.kind | e.ch, e.a, e.b));
+        messages.add(new Message(time, e.kind | e.ch, e.a, e.b, e.track));
       if (e.kind == 0x51) {
         if (fixed == 0) tempos.add(new Tempo(time, beat, e.a));
         tempo = e.a;

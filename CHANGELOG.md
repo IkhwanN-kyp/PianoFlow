@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.0-beta.6] - 2026-11-26
+
+- Add track/channel parts with I play, Automatic backing and Mute roles, per-part hand/level, global backing mix and saved per-song choices.
+- Add isolated offline part audition, automatic piano/backing suggestions from GM programs, and shared-channel/program-change information.
+- Play backing during practice with the trainer clock: wait, tempo, pause, seek and loops remain synchronized; only learner parts are scored and displayed.
+- Preserve controller/program source tracks through MIDI library roundtrips; use file programs for playback independently from live keyboard sound selection.
+- Handle simultaneous learner unisons and overlapping playback note releases without requiring duplicate key presses or cutting held notes.
+- Include an original five-note piano/guitar MIDI fixture, update the bilingual guide and retain previous features, signing identity and user data.
+
 ## [0.2.0-beta.5] - 2026-11-26
 
 - Add Free play with live rising note bars for multitouch, computer keyboard and MIDI input; bars follow physical key duration and MIDI velocity.

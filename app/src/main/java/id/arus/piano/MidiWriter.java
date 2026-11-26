@@ -77,8 +77,9 @@ public final class MidiWriter {
       meta.add(new Ev(tick(m.beat), 255, 88, 4, m.numerator, power, 24, 8));
     }
     for (MidiSong.Message m : song.messages) {
-      if ((m.status & 240) == 0xc0) meta.add(new Ev(tick(song.beatAt(m.time)), m.status, m.a));
-      else meta.add(new Ev(tick(song.beatAt(m.time)), m.status, m.a, m.b));
+      List<Ev> list = tracks.computeIfAbsent(Math.max(0, m.track), k -> new ArrayList<>());
+      if ((m.status & 240) == 0xc0) list.add(new Ev(tick(song.beatAt(m.time)), m.status, m.a));
+      else list.add(new Ev(tick(song.beatAt(m.time)), m.status, m.a, m.b));
     }
     int highest = 0;
     for (int id : song.tracks.keySet()) highest = Math.max(highest, id);

@@ -1,6 +1,6 @@
 # PianoFlow — English overview
 
-Native Android piano practice, continuing Arus Piano with the same application ID (`id.arus.piano`) and signing certificate. Free of ads, subscriptions, mandatory accounts and commercial song-import quotas. Release 0.2.0-beta.5 is intended for personal testing.
+Native Android piano practice, continuing Arus Piano with the same application ID (`id.arus.piano`) and signing certificate. Free of ads, subscriptions, mandatory accounts and commercial song-import quotas. Release 0.2.0-beta.6 is intended for personal testing.
 
 Download the ARM64 APK from [official Releases](https://github.com/IkhwanN-kyp/PianoFlow/releases). Install over the old app to retain its data; do not uninstall. For future versions use Settings > Software Update, select Stable/Beta, and choose Download & Install Update. APK SHA-256, cryptographic signature, certificate, package ID and increasing version are checked before the Android system installer. Google Play Services are not used.
 
@@ -21,3 +21,9 @@ Tap **Free play** in the upper toolbar and play screen keys, a computer keyboard
 **Key labels** offers C D E F G A B, 1–7, Do Re Mi Fa Sol La Si or no labels. These settings persist across launches and apply to practice too. Number 1 / Do always means C, with sharps on black keys and small octave anchors (C4 is middle C). This does not transpose the piano.
 
 **Settings > Help & guide** includes an offline topic guide in both languages; **About** contains installed version/code, optional support, upstream credits and license texts.
+
+## Parts and automatic backing
+
+After importing a MIDI, open **Parts & backing**. Each track/channel part offers **I play**, **Automatic backing** or **Mute**, hand assignment and a part level. A global backing level controls the balance. **Listen** auditions one part in isolation for up to 12 seconds near its first note, including muted parts. Choices persist per song.
+
+Practice scores and displays learner parts only, while backing follows the same song clock for Wait, tempo, pause, seek and loops. Listen mode plays every non-muted part. File GM programs are independent of the live keyboard’s selected sound. Shared channels retain shared program/pedal/bend state; instruments merged in one track/channel cannot be guessed apart. Channel-10 percussion remains excluded. Use tablet audio for the bundled GM SoundFont; external MIDI instruments depend on receiver support. `samples/duet-asli.mid` is an original five-note piano/guitar exercise.

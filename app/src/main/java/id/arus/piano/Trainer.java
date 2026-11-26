@@ -5,6 +5,7 @@ import java.util.*;
 /** Clock, chord gating and scoring. All calls belong to the UI thread. */
 public final class Trainer {
   public MidiSong song = MidiSong.exercise();
+  public Arrangement arrangement = new Arrangement(song);
   public double time = 0, speed = 1, loopA = 0, loopB = 0;
   public boolean playing = false, wait = true, listen = false, loop = false;
   public int hand = 0, hits = 0, misses = 0, wrong = 0;
@@ -14,17 +15,41 @@ public final class Trainer {
   private int cursor = 0;
 
   public int role(MidiSong.Note n) {
-    int r = roles.getOrDefault(n.track, 0);
+    Arrangement.Part part = arrangement.part(n);
+    int r = part != null && part.hand >= 0 ? part.hand : roles.getOrDefault(n.track, 0);
     return r == 0 ? (n.pitch < 60 ? 1 : 2) : r;
   }
 
   public boolean selected(MidiSong.Note n) {
     int r = role(n);
-    return n.pitch >= 21 && n.pitch <= 108 && r != 3 && (hand == 0 || hand == r);
+    return n.pitch >= 21
+        && n.pitch <= 108
+        && r != 3
+        && arrangement.mode(n) == Arrangement.PLAY
+        && (hand == 0 || hand == r);
+  }
+
+  public boolean visible(MidiSong.Note n) {
+    return role(n) != 3
+        && (listen
+            ? arrangement.mode(n) != Arrangement.MUTE
+            : arrangement.mode(n) == Arrangement.PLAY);
+  }
+
+  public boolean audible(MidiSong.Note n, boolean listening) {
+    return role(n) != 3
+        && arrangement.mode(n) != Arrangement.MUTE
+        && (listening || arrangement.mode(n) == Arrangement.BACKING);
+  }
+
+  public boolean hasPracticeNotes() {
+    for (MidiSong.Note n : song.notes) if (selected(n)) return true;
+    return false;
   }
 
   public void load(MidiSong s) {
     song = s;
+    arrangement = new Arrangement(s);
     roles.clear();
     loop = false;
     loopA = 0;
@@ -64,7 +89,7 @@ public final class Trainer {
     } else if (!listen) {
       while (cursor < judged.length && song.notes.get(cursor).start + .18 < target) {
         if (judged[cursor] == 0 && selected(song.notes.get(cursor))) {
-          judged[cursor] = 2;
+          judgeGroup(cursor, (byte) 2);
           misses++;
         }
         cursor++;
@@ -94,12 +119,21 @@ public final class Trainer {
       }
     }
     if (best >= 0) {
-      judged[best] = 1;
+      judgeGroup(best, (byte) 1);
       hits++;
       return true;
     }
     wrong++;
     return false;
+  }
+
+  private void judgeGroup(int index, byte result) {
+    MidiSong.Note target = song.notes.get(index);
+    for (int i = lower(target.start - .000001); i < judged.length; i++) {
+      MidiSong.Note note = song.notes.get(i);
+      if (note.start > target.start + .000001) break;
+      if (note.pitch == target.pitch && judged[i] == 0 && selected(note)) judged[i] = result;
+    }
   }
 
   public int accuracy() {

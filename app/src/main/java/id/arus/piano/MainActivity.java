@@ -23,15 +23,15 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
   private Button play, mode, waitButton, handButton, audioButton, outButton, importButton;
   private SeekBar position, tempoSlider;
   private LinearLayout timeline, songControls;
-  private Button freeButton, clearLive;
+  private Button freeButton, clearLive, partsButton;
+  private SongPlayback songPlayback;
+  private MidiSong playbackSong;
   private boolean freePlay = false;
   private final ExecutorService loader = Executors.newSingleThreadExecutor();
   private final ExecutorService updateChecks = Executors.newSingleThreadExecutor();
   private final boolean[][] hardware = new boolean[16][128];
   private final int[] touchCount = new int[128];
   private final boolean[] sent = new boolean[128];
-  private final float[] levels = new float[128];
-  private final float[][] channelLevels = new float[16][128];
   private boolean audio = true,
       guide = false,
       dragging = false,
@@ -42,7 +42,7 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
   private int outputChannel = 0, loadGeneration = 0, program = 0;
   private volatile boolean routeAudio = true, resumed = false;
   private final ArrayList<MidiSong.Note> activeNotes = new ArrayList<>();
-  private int songCursor = 0, messageCursor = 0;
+  private int songCursor = 0;
   private double lastTime = -1;
   private MidiSong lastSong;
   private long lastUi = 0;
@@ -163,6 +163,8 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
     status.setSingleLine(true);
     status.setEllipsize(android.text.TextUtils.TruncateAt.END);
     sub.addView(status, new LinearLayout.LayoutParams(0, dp(42), 1));
+    partsButton = button(tr("Bagian & pengiring", "Parts & backing"), this::partsMenu);
+    sub.addView(partsButton);
     freeButton = button(tr("Bermain bebas", "Free play"), () -> setFreePlay(!freePlay));
     sub.addView(freeButton);
     sub.addView(button(tr("Label tuts", "Key labels"), this::keyLabels));
@@ -228,6 +230,13 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
         button(
             "▶ Mulai",
             () -> {
+              if (!trainer.playing && !trainer.listen && !trainer.hasPracticeNotes()) {
+                status(
+                    tr(
+                        "Pilih setidaknya satu bagian Saya mainkan di Bagian & pengiring.",
+                        "Choose at least one I play part in Parts & backing."));
+                return;
+              }
               trainer.playing = !trainer.playing;
               if (trainer.playing && trainer.time >= trainer.song.duration)
                 seek(trainer.loop ? trainer.loopA : 0);
@@ -342,6 +351,7 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
   }
 
   private void updateLearningControls() {
+    partsButton.setVisibility(freePlay ? View.GONE : View.VISIBLE);
     timeline.setVisibility(freePlay ? View.GONE : View.VISIBLE);
     songControls.setVisibility(freePlay ? View.GONE : View.VISIBLE);
     outButton.setVisibility(freePlay ? View.GONE : View.VISIBLE);
@@ -385,6 +395,20 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
             })
         .setNegativeButton(tr("Batal", "Cancel"), null)
         .show();
+  }
+
+  private void partsMenu() {
+    trainer.playing = false;
+    quiet();
+    for (Arrangement.Part p : trainer.arrangement.parts)
+      if (p.hand < 0) {
+        int role = trainer.roles.getOrDefault(p.track, 0);
+        p.hand = role == 3 ? 0 : role;
+        if (role == 3) p.mode = Arrangement.MUTE;
+      }
+    PartSettings.save(this, currentPath, trainer.arrangement);
+    startActivity(
+        new Intent(this, PartsActivity.class).putExtra("song", currentPath).putExtra("name", name));
   }
 
   private void hands() {
@@ -440,6 +464,13 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
                       trainer.roles.getOrDefault(id, 0),
                       (dd, r) -> {
                         trainer.roles.put(id, r);
+                        for (Arrangement.Part part : trainer.arrangement.parts)
+                          if (part.track == id) {
+                            part.hand = r == 3 ? 0 : r;
+                            if (r == 3) part.mode = Arrangement.MUTE;
+                            else if (part.mode == Arrangement.MUTE) part.mode = Arrangement.PLAY;
+                          }
+                        PartSettings.save(this, currentPath, trainer.arrangement);
                         seek(trainer.time);
                         dd.dismiss();
                       })
@@ -493,12 +524,15 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
     if (request == 30) {
       MidiSong song = trainer.song;
       Map<Integer, Integer> roles = new HashMap<>(trainer.roles);
+      Arrangement arrangement = new Arrangement(song);
+      arrangement.copyFrom(trainer.arrangement);
       loader.execute(
           () -> {
             try (OutputStream out = getContentResolver().openOutputStream(uri)) {
               Trainer snapshot = new Trainer();
               snapshot.load(song);
               snapshot.roles.putAll(roles);
+              snapshot.arrangement.copyFrom(arrangement);
               ScorePdf.write(this, snapshot, out);
               runOnUiThread(() -> status(tr("PDF berhasil diekspor", "PDF exported")));
             } catch (Exception e) {
@@ -560,13 +594,16 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
                       .remove("uri")
                       .apply();
                   if (!store) restoreSession();
+                  PartSettings.load(this, currentPath, trainer.arrangement);
                   updateLearningControls();
                   status(
                       song.notes.size()
                           + tr(" not · ", " notes · ")
                           + song.tracks.size()
                           + tr(" track · drum dilewati: ", " tracks · percussion skipped: ")
-                          + song.percussionSkipped);
+                          + song.percussionSkipped
+                          + " · "
+                          + tr("atur di Bagian & pengiring", "review Parts & backing"));
                   piano.invalidate();
                 });
           } catch (Exception e) {
@@ -701,7 +738,7 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
                         "Choose a MIDI output port first"));
                 return;
               }
-              flushOutput();
+              quiet();
               guide = !guide;
               outButton.setText(Ui.t(this, guide ? "Panduan OUT: ON" : "Panduan OUT: OFF"));
               piano.invalidate();
@@ -732,7 +769,8 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
       tr("Gunakan SoundFont bawaan", "Use bundled SoundFont"),
       tr("Tema gelap / terang", "Dark / light theme"),
       "Bahasa / Language",
-      tr("Ikuti program MIDI: ", "Follow MIDI programs: ") + (followPrograms ? "ON" : "OFF"),
+      tr("Ikuti program input MIDI: ", "Follow MIDI input programs: ")
+          + (followPrograms ? "ON" : "OFF"),
       tr("Bantuan & panduan", "Help & guide"),
       tr("Tentang aplikasi", "About")
     };
@@ -750,11 +788,14 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
                     () -> {
                       boolean ok = synth.importBank(new File(getFilesDir(), "TimGM6mb.sf2"));
                       runOnUiThread(
-                          () ->
-                              status(
-                                  ok
-                                      ? tr("Bank bawaan aktif", "Bundled bank active")
-                                      : "SoundFont error"));
+                          () -> {
+                            quiet();
+                            piano.invalidate();
+                            status(
+                                ok
+                                    ? tr("Bank bawaan aktif", "Bundled bank active")
+                                    : "SoundFont error");
+                          });
                     });
               }
               if (w == 4) {
@@ -776,7 +817,9 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
                     .show();
               if (w == 6) {
                 followPrograms = !followPrograms;
-                status(tr("Ikuti program MIDI: ", "Follow MIDI programs: ") + followPrograms);
+                status(
+                    tr("Ikuti program input MIDI: ", "Follow MIDI input programs: ")
+                        + followPrograms);
               }
               if (w == 7) help();
               if (w == 8) startActivity(new Intent(this, AboutActivity.class));
@@ -838,11 +881,14 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
             if (!temp.renameTo(bank)) throw new IOException("Cannot store SF2");
             settings().edit().putString("soundfont", bank.getPath()).apply();
             runOnUiThread(
-                () ->
-                    status(
-                        tr(
-                            "SF2 aktif; preset tersedia mengikuti isi bank.",
-                            "SF2 active; available presets depend on the bank.")));
+                () -> {
+                  quiet();
+                  piano.invalidate();
+                  status(
+                      tr(
+                          "SF2 aktif; preset tersedia mengikuti isi bank.",
+                          "SF2 active; available presets depend on the bank."));
+                });
           } catch (Exception e) {
             temp.delete();
             runOnUiThread(
@@ -936,6 +982,7 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
   }
 
   private void quiet() {
+    if (songPlayback != null) songPlayback.stop();
     flushOutput();
     if (synth != null) synth.silence();
     if (piano != null) Arrays.fill(piano.sounding, false);
@@ -946,23 +993,33 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
   public void frame() {
     if (freePlay) return;
     double t = trainer.time;
+    if (playbackSong != trainer.song) {
+      if (songPlayback != null) songPlayback.stop();
+      playbackSong = trainer.song;
+      songPlayback =
+          new SongPlayback(
+              trainer,
+              (channel, kind, a, b) -> {
+                if (!audio) return;
+                if (external) {
+                  // Guide and file playback share channel 0: emit their union once below.
+                  if (guide && channel == outputChannel && (kind == 0x90 || kind == 0x80)) return;
+                  midi.sendMessage(kind | channel, a, b);
+                } else synth.midi(32 + channel, kind, a, b);
+              });
+    }
+    songPlayback.sync(t, trainer.playing, trainer.listen);
     boolean reset = lastSong != trainer.song || lastTime < 0 || t < lastTime;
     if (reset) {
       activeNotes.clear();
-      songCursor = messageCursor = 0;
+      songCursor = 0;
       lastSong = trainer.song;
-      if (trainer.listen) {
-        synth.silence();
-        synth.program(program);
-      }
     }
     while (songCursor < trainer.song.notes.size()
         && trainer.song.notes.get(songCursor).start <= t + .45) {
       MidiSong.Note n = trainer.song.notes.get(songCursor++);
       if (n.end > t) activeNotes.add(n);
     }
-    Arrays.fill(levels, 0);
-    for (float[] ch : channelLevels) Arrays.fill(ch, 0);
     Arrays.fill(piano.sounding, false);
     boolean[] desired = new boolean[128];
     int[] velocity = new int[128];
@@ -973,29 +1030,23 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
         continue;
       }
       if (n.pitch < 21 || n.pitch > 108 || trainer.role(n) == 3) continue;
-      if (trainer.playing && trainer.listen && n.start <= t) {
-        if (audio && !external)
-          channelLevels[n.channel][n.pitch] =
-              Math.max(channelLevels[n.channel][n.pitch], n.velocity / 127f);
-        piano.sounding[n.pitch] = true;
-        if (audio && external) {
-          desired[n.pitch] = true;
-          velocity[n.pitch] = Math.max(velocity[n.pitch], n.velocity);
-        }
+      if (trainer.playing
+          && trainer.listen
+          && trainer.arrangement.mode(n) != Arrangement.MUTE
+          && n.start <= t) piano.sounding[n.pitch] = true;
+      if (trainer.playing
+          && audio
+          && external
+          && guide
+          && n.channel == outputChannel
+          && trainer.audible(n, trainer.listen)
+          && n.start <= t) {
+        desired[n.pitch] = true;
+        velocity[n.pitch] = Math.max(velocity[n.pitch], trainer.arrangement.velocity(n));
       }
       if (trainer.playing && guide && trainer.selected(n)) {
         desired[n.pitch] = true;
         velocity[n.pitch] = 80;
-      }
-    }
-    synth.scheduledChannels(channelLevels);
-    while (messageCursor < trainer.song.messages.size()
-        && trainer.song.messages.get(messageCursor).time <= t) {
-      MidiSong.Message m = trainer.song.messages.get(messageCursor++);
-      int kind = m.status & 240;
-      if (trainer.listen && (kind != 0xc0 || followPrograms)) {
-        if (audio && !external) synth.midi(32 + (m.status & 15), kind, m.a, m.b);
-        if (audio && external) midi.sendMessage(kind | outputChannel, m.a, m.b);
       }
     }
     if (audio && external)
@@ -1113,6 +1164,11 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
   protected void onResume() {
     super.onResume();
     resumed = true;
+    if (trainer != null) {
+      String before = trainer.arrangement.learningSignature();
+      PartSettings.load(this, currentPath, trainer.arrangement);
+      if (!before.equals(trainer.arrangement.learningSignature())) trainer.seek(trainer.time);
+    }
     if (piano != null) piano.start();
   }
 
@@ -1120,6 +1176,7 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
   protected void onPause() {
     super.onPause();
     saveSession();
+    PartSettings.save(this, currentPath, trainer.arrangement);
     resumed = false;
     trainer.playing = false;
     if (piano != null) piano.stop();
