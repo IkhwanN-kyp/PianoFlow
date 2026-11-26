@@ -10,6 +10,10 @@ Diperiksa 26 November 2026 (Asia/Jakarta). Hasil kompilasi, emulator dan hardwar
 - Sample PCM nonzero dan preset flute diverifikasi pada private channel 57 dan 255, termasuk setelah panic/reset: channel tinggi tidak alias ke channel lain atau berubah menjadi drum. Engine 256 channel menyisakan 0–31 untuk live, 32–47 untuk Follow MIDI, dan 48–255 untuk hingga 208 instrumen tetap. Polyphony suara tetap dapat diatur terpisah.
 - MIDI OUT memetakan instrumen tetap ke channel melodis yang tersedia dan tidak mengklaim semua perangkat mendukung GM. MatePad/P-145 fisik serta latensi USB/audio tetap belum diuji. SF2 kustom yang tidak lengkap mungkin tidak menyediakan preset yang diminta.
 
+Rilis beta.7 berhasil melewati job test/release: https://github.com/IkhwanN-kyp/PianoFlow/actions/runs/45749843623 . CI tanpa Google Play Services lulus 255 pemeriksaan runtime dan 160 pemeriksaan override instrumen; fixture privat menambah runtime ARM64 menjadi 262. APK resmi dipasang menimpa versi emulator dan kembali lulus 262 pemeriksaan, termasuk marker data lama. Package `id.arus.piano`, versi `0.2.0-beta.7`, kode `2002007`, non-debuggable, sertifikat sama. Ukuran 27.188.240 byte; SHA-256 `42fda0f0f62cae149d854eacdd715bb6d02fc2f63b7107f7946fdfe07e8a7396` dan signature diperiksa setelah unduhan. Rilis: https://github.com/IkhwanN-kyp/PianoFlow/releases/tag/v0.2.0-beta.7 .
+
+![Pilihan manual instrumen per bagian](docs/screenshots/parts-instruments.png)
+
 ## Bagian instrumen dan pengiring beta.6
 
 - 43 assertion parser/trainer + 300 mutasi MIDI, 110 pemeriksaan extended, dan 391 pemeriksaan live-learning tetap lolos. Tambahan 40 pemeriksaan aransemen mencakup grouping track/channel, GM, pemilihan learner/backing/mute, penilaian/tampilan, wait/tempo, sustain, seek/loop, volume, solo, unison/overlap, dan roundtrip provenance pesan MIDI.
