@@ -26,6 +26,7 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
   private Button freeButton, clearLive, partsButton;
   private SongPlayback songPlayback;
   private MidiSong playbackSong;
+  private boolean playbackExternal;
   private boolean freePlay = false;
   private final ExecutorService loader = Executors.newSingleThreadExecutor();
   private final ExecutorService updateChecks = Executors.newSingleThreadExecutor();
@@ -993,9 +994,10 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
   public void frame() {
     if (freePlay) return;
     double t = trainer.time;
-    if (playbackSong != trainer.song) {
+    if (playbackSong != trainer.song || playbackExternal != external) {
       if (songPlayback != null) songPlayback.stop();
       playbackSong = trainer.song;
+      playbackExternal = external;
       songPlayback =
           new SongPlayback(
               trainer,
@@ -1006,9 +1008,20 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
                   if (guide && channel == outputChannel && (kind == 0x90 || kind == 0x80)) return;
                   midi.sendMessage(kind | channel, a, b);
                 } else synth.midi(32 + channel, kind, a, b);
-              });
+              },
+              external);
     }
-    songPlayback.sync(t, trainer.playing, trainer.listen);
+    try {
+      songPlayback.sync(t, trainer.playing, trainer.listen);
+    } catch (IllegalStateException error) {
+      trainer.playing = false;
+      quiet();
+      play.setText(Ui.t(this, "▶ Mulai"));
+      status(
+          tr("Kapasitas jalur suara tidak cukup: ", "Playback routing failed: ")
+              + error.getMessage());
+      return;
+    }
     boolean reset = lastSong != trainer.song || lastTime < 0 || t < lastTime;
     if (reset) {
       activeNotes.clear();
@@ -1038,7 +1051,7 @@ public final class MainActivity extends Activity implements PianoView.Host, Midi
           && audio
           && external
           && guide
-          && n.channel == outputChannel
+          && songPlayback.routeOf(n) == outputChannel
           && trainer.audible(n, trainer.listen)
           && n.start <= t) {
         desired[n.pitch] = true;

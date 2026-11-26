@@ -17,5 +17,7 @@ final class FluidNative {
 
   static native void panic(long handle);
 
+  static native int programOnChannel(long handle, int channel);
+
   static native void destroy(long handle);
 }

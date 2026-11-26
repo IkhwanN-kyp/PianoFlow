@@ -13,6 +13,7 @@ final class PartSettings {
       part.mode = Math.max(0, Math.min(2, p.getInt(key + ":mode", part.mode)));
       part.volume = Math.max(0, Math.min(100, p.getInt(key + ":volume", 100)));
       part.hand = Math.max(-1, Math.min(2, p.getInt(key + ":hand", -1)));
+      part.instrument = Math.max(-1, Math.min(127, p.getInt(key + ":instrument", -1)));
     }
   }
 
@@ -24,6 +25,7 @@ final class PartSettings {
         .putInt(key + ":mode", part.mode)
         .putInt(key + ":volume", part.volume)
         .putInt(key + ":hand", part.hand)
+        .putInt(key + ":instrument", part.instrument)
         .apply();
   }
 
@@ -43,7 +45,8 @@ final class PartSettings {
       String key = prefix + ":" + p.key;
       e.putInt(key + ":mode", p.mode)
           .putInt(key + ":volume", p.volume)
-          .putInt(key + ":hand", p.hand);
+          .putInt(key + ":hand", p.hand)
+          .putInt(key + ":instrument", p.instrument);
     }
     e.apply();
   }

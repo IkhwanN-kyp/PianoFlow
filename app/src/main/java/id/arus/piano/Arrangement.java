@@ -11,7 +11,11 @@ public final class Arrangement {
     public final String name;
     public final double first;
     public final boolean changingProgram, sharedChannel;
-    public int mode = PLAY, volume = 100, hand = -1;
+    public int mode = PLAY, volume = 100, hand = -1, instrument = -1;
+
+    public int selectedProgram() {
+      return instrument < 0 ? program : instrument;
+    }
 
     Part(
         int key,
@@ -136,6 +140,7 @@ public final class Arrangement {
       p.mode = from.mode;
       p.volume = from.volume;
       p.hand = from.hand;
+      p.instrument = from.instrument;
     }
   }
 }

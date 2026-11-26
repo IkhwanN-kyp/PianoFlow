@@ -1,6 +1,6 @@
 # PianoFlow — English overview
 
-Native Android piano practice, continuing Arus Piano with the same application ID (`id.arus.piano`) and signing certificate. Free of ads, subscriptions, mandatory accounts and commercial song-import quotas. Release 0.2.0-beta.6 is intended for personal testing.
+Native Android piano practice, continuing Arus Piano with the same application ID (`id.arus.piano`) and signing certificate. Free of ads, subscriptions, mandatory accounts and commercial song-import quotas. Release 0.2.0-beta.7 is intended for personal testing.
 
 Download the ARM64 APK from [official Releases](https://github.com/IkhwanN-kyp/PianoFlow/releases). Install over the old app to retain its data; do not uninstall. For future versions use Settings > Software Update, select Stable/Beta, and choose Download & Install Update. APK SHA-256, cryptographic signature, certificate, package ID and increasing version are checked before the Android system installer. Google Play Services are not used.
 
@@ -27,3 +27,7 @@ Tap **Free play** in the upper toolbar and play screen keys, a computer keyboard
 After importing a MIDI, open **Parts & backing**. Each track/channel part offers **I play**, **Automatic backing** or **Mute**, hand assignment and a part level. A global backing level controls the balance. **Listen** auditions one part in isolation for up to 12 seconds near its first note, including muted parts. Choices persist per song.
 
 Practice scores and displays learner parts only, while backing follows the same song clock for Wait, tempo, pause, seek and loops. Listen mode plays every non-muted part. File GM programs are independent of the live keyboard’s selected sound. Shared channels retain shared program/pedal/bend state; instruments merged in one track/channel cannot be guessed apart. Channel-10 percussion remains excluded. Use tablet audio for the bundled GM SoundFont; external MIDI instruments depend on receiver support. `samples/duet-asli.mid` is an original five-note piano/guitar exercise.
+
+### Choose a different instrument per part
+
+Tap **Instrument** on a part card for Piano, Flute, Guitar, other quick choices or all **128 GM presets**. **Follow MIDI instrument** restores source program changes. Choices persist per song, affect audition, backing and Listen, and preserve scores and the original MIDI. Fixed parts get separate voices even if they share a source MIDI channel. Live keyboard sound remains on the main Instrument button. File sustain/bend still follow the source channel; MIDI OUT needs receiver instrument support and enough melodic channels.

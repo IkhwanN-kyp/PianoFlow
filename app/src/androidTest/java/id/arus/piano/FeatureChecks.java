@@ -174,6 +174,7 @@ final class FeatureChecks {
     checkLive(test, activity);
     checkHelp(test, context);
     ArrangementChecks.run(test, activity);
+    InstrumentChecks.run(test, activity);
     File future = new File(context.getFilesDir(), "update-fixture.apk");
     if (future.isFile()) verifyUpdate(test, context, future);
   }

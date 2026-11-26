@@ -14,6 +14,7 @@ public final class PartsActivity extends Activity {
   private final ExecutorService worker = Executors.newSingleThreadExecutor();
   private final Handler handler = new Handler(Looper.getMainLooper());
   private Trainer trainer;
+  private AlertDialog instrumentPicker;
   private OfflineSynth synth;
   private SongPlayback playback;
   private TextView info, mixText;
@@ -104,14 +105,16 @@ public final class PartsActivity extends Activity {
     for (Arrangement.Part part : trainer.arrangement.parts) shared |= part.sharedChannel;
     info.setText(
         tr(
-                "Dengarkan mengisolasi satu bagian selama hingga 12 detik. Nama instrumen mengikuti"
-                    + " program General MIDI dalam berkas.",
-                "Listen isolates one part for up to 12 seconds. Instrument names follow the file’s"
-                    + " General MIDI programs.")
+                "Dengarkan mengisolasi satu bagian hingga 12 detik. Pilih instrumen pada setiap"
+                    + " bagian, atau ikuti program MIDI asal.",
+                "Listen isolates one part for up to 12 seconds. Choose an instrument on each part,"
+                    + " or follow its MIDI program.")
             + (shared
                 ? tr(
-                    " Track yang berbagi channel juga berbagi program, pedal dan pitch bend.",
-                    " Tracks sharing a channel also share program, pedal and pitch bend.")
+                    " Instrumen pilihan memiliki suara terpisah, termasuk jika channel asal sama."
+                        + " Pedal dan pitch bend berkas tetap mengikuti channel asal.",
+                    " Fixed instruments have separate voices, including on shared source channels."
+                        + " File pedal and pitch bend still follow the source channel.")
                 : ""));
     adapter =
         new BaseAdapter() {
@@ -180,17 +183,36 @@ public final class PartsActivity extends Activity {
             String.format(
                     java.util.Locale.US,
                     "GM %03d · %s",
-                    part.program + 1,
-                    GeneralMidi.NAMES[part.program])
+                    part.selectedProgram() + 1,
+                    GeneralMidi.NAMES[part.selectedProgram()])
+                + (part.instrument < 0
+                    ? tr(" · asal MIDI", " · MIDI source")
+                    : tr(" · pilihan Anda", " · your selection"))
                 + " · "
                 + part.noteCount
                 + tr(" not", " notes")
-                + (part.changingProgram
+                + (part.changingProgram && part.instrument < 0
                     ? tr(" · program berubah di dalam lagu", " · program changes within song")
                     : ""),
             13);
     subtitle.setTextColor(Ui.muted(this));
     box.addView(subtitle);
+    String selected =
+        part.instrument < 0
+            ? tr("Ikuti MIDI · ", "Follow MIDI · ") + GeneralMidi.NAMES[part.program]
+            : GeneralMidi.NAMES[part.instrument];
+    Button instrument =
+        Ui.button(
+            this,
+            tr("Instrumen · ", "Instrument · ") + selected + " ▾",
+            tr("Instrumen · ", "Instrument · ") + selected + " ▾",
+            () -> instruments(part));
+    instrument.setContentDescription(tr("Instrumen bagian ", "Part instrument ") + part.name);
+    instrument.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+    LinearLayout.LayoutParams instrumentSize = new LinearLayout.LayoutParams(-1, Ui.dp(this, 44));
+    instrumentSize.setMargins(Ui.dp(this, 4), Ui.dp(this, 4), Ui.dp(this, 4), Ui.dp(this, 4));
+    instrument.setLayoutParams(instrumentSize);
+    box.addView(instrument);
     HorizontalScrollView scroll = new HorizontalScrollView(this);
     LinearLayout row = Ui.row(this);
     Spinner role =
@@ -277,6 +299,67 @@ public final class PartsActivity extends Activity {
     return box;
   }
 
+  private void instruments(Arrangement.Part part) {
+    if (instrumentPicker != null) instrumentPicker.dismiss();
+    String[] labels = {
+      tr("Ikuti instrumen MIDI", "Follow MIDI instrument"),
+      "Grand Piano 1",
+      "Flute",
+      "Guitar (nylon)",
+      "Electric Piano",
+      "Organ",
+      "Strings",
+      tr("128 instrumen General MIDI…", "128 General MIDI instruments…")
+    };
+    int[] programs = {-1, 0, 73, 24, 4, 16, 48};
+    instrumentPicker =
+        new AlertDialog.Builder(this)
+            .setTitle(tr("Instrumen · ", "Instrument · ") + part.name)
+            .setItems(
+                labels,
+                (dialog, index) -> {
+                  if (index < programs.length) selectInstrument(part, programs[index]);
+                  else {
+                    String[] all = new String[129];
+                    all[0] = tr("Ikuti instrumen MIDI", "Follow MIDI instrument");
+                    for (int i = 0; i < 128; i++)
+                      all[i + 1] =
+                          String.format(
+                              java.util.Locale.US, "%03d · %s", i + 1, GeneralMidi.NAMES[i]);
+                    instrumentPicker =
+                        new AlertDialog.Builder(this)
+                            .setTitle(
+                                tr("128 instrumen General MIDI", "128 General MIDI instruments"))
+                            .setSingleChoiceItems(
+                                all,
+                                part.instrument + 1,
+                                (choices, which) -> {
+                                  selectInstrument(part, which - 1);
+                                  choices.dismiss();
+                                })
+                            .setNegativeButton(tr("Batal", "Cancel"), null)
+                            .create();
+                    instrumentPicker.show();
+                  }
+                })
+            .setNegativeButton(tr("Batal", "Cancel"), null)
+            .create();
+    instrumentPicker.show();
+  }
+
+  private void selectInstrument(Arrangement.Part part, int program) {
+    stopPreview();
+    part.instrument = Math.max(-1, Math.min(127, program));
+    PartSettings.savePart(this, path, part);
+    adapter.notifyDataSetChanged();
+    info.setText(
+        tr("Instrumen tersimpan · ", "Instrument saved · ")
+            + part.name
+            + " · "
+            + GeneralMidi.NAMES[part.selectedProgram()]
+            + tr(". Tekan Dengarkan untuk mencobanya.", ". Tap Listen to audition it."));
+  }
+
   private void audition(int key) {
     stopPreview();
     pending = key;
@@ -340,7 +423,7 @@ public final class PartsActivity extends Activity {
         tr("Preview bagian · ", "Part preview · ")
             + part.name
             + " · "
-            + GeneralMidi.NAMES[part.program]);
+            + GeneralMidi.NAMES[part.selectedProgram()]);
     adapter.notifyDataSetChanged();
     handler.post(tick);
   }
@@ -354,8 +437,13 @@ public final class PartsActivity extends Activity {
             stopPreview();
             return;
           }
-          playback.sync(time, true, true);
-          handler.postDelayed(this, 10);
+          try {
+            playback.sync(time, true, true);
+            handler.postDelayed(this, 10);
+          } catch (IllegalStateException error) {
+            stopPreview();
+            Ui.error(PartsActivity.this, error);
+          }
         }
       };
 
@@ -387,6 +475,7 @@ public final class PartsActivity extends Activity {
   @Override
   protected void onDestroy() {
     closed = true;
+    if (instrumentPicker != null) instrumentPicker.dismiss();
     stopPreview();
     if (synth != null) synth.close();
     worker.shutdownNow();

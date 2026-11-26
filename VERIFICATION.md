@@ -1,6 +1,14 @@
-# Verifikasi PianoFlow 0.2.0-beta.6
+# Verifikasi PianoFlow 0.2.0-beta.7
 
 Diperiksa 26 November 2026 (Asia/Jakarta). Hasil kompilasi, emulator dan hardware dipisahkan.
+
+## Instrumen per bagian beta.7
+
+- Pilihan cepat Piano/Flute/Guitar/EP/Organ/Strings, daftar lengkap 128 GM, serta Follow MIDI tersedia sebagai dialog native pada setiap kartu bagian. Pilihan disimpan per lagu, termasuk pada snapshot/fresh arrangement, tanpa menulis ulang MIDI atau mengubah konfigurasi penilaian.
+- 43 assertion + 300 mutasi MIDI, 110 extended, 391 live-learning, 40 arrangement, dan **160 pemeriksaan override instrumen** lolos. Termasuk isolasi tiga preset dari channel asal yang sama, bank/program berkas yang tidak menimpa preset tetap, pedal, seek/loop, Note Off independen, seluruh nomor GM, MIDI OUT, serta kapasitas route yang dilaporkan secara eksplisit.
+- **262 pemeriksaan Android ARM64** lolos. Menu benar-benar dipilih melalui widget dialog Android, semua 129 opsi (Follow + 128 GM) diperiksa. FluidSynth dikueri untuk membuktikan program piano 0, flute 73, dan gitar 24 aktif pada jalur terpisah. Preview tetap flute setelah event PC/bank MIDI berkas; suara live tidak menimpa program bagian; pilihan dan skor bertahan saat kembali ke latihan.
+- Sample PCM nonzero dan preset flute diverifikasi pada private channel 57 dan 255, termasuk setelah panic/reset: channel tinggi tidak alias ke channel lain atau berubah menjadi drum. Engine 256 channel menyisakan 0–31 untuk live, 32–47 untuk Follow MIDI, dan 48–255 untuk hingga 208 instrumen tetap. Polyphony suara tetap dapat diatur terpisah.
+- MIDI OUT memetakan instrumen tetap ke channel melodis yang tersedia dan tidak mengklaim semua perangkat mendukung GM. MatePad/P-145 fisik serta latensi USB/audio tetap belum diuji. SF2 kustom yang tidak lengkap mungkin tidak menyediakan preset yang diminta.
 
 ## Bagian instrumen dan pengiring beta.6
 

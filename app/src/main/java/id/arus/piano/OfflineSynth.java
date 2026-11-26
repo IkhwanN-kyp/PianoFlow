@@ -51,7 +51,7 @@ public final class OfflineSynth implements AutoCloseable {
   }
 
   public synchronized void midi(int channel, int kind, int a, int b) {
-    if (handle != 0 && enabled) FluidNative.message(handle, (kind << 8) | (channel & 63), a, b);
+    if (handle != 0 && enabled) FluidNative.message(handle, (kind << 8) | (channel & 255), a, b);
   }
 
   public void key(int note, int velocity, boolean on) {

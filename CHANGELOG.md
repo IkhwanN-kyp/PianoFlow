@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.0-beta.7] - 2026-11-26
+
+- Add an actionable instrument picker on every part: quick Piano, Flute, Guitar, Electric Piano, Organ and Strings choices, the full 128 GM list, and Follow MIDI.
+- Save fixed instruments per song, apply them to audition, Listen and backing, and preserve role/hand/level and scoring data.
+- Isolate fixed part presets and note releases even when tracks share a source channel; ignore file program/bank changes only on fixed voices.
+- Expand private FluidSynth routing and ensure all private channels are melodic; retain live keyboard sound controls independently.
+- Remap fixed MIDI OUT parts to available melodic channels and report capacity constraints rather than silently replacing other instruments.
+
 ## [0.2.0-beta.6] - 2026-11-26
 
 - Add track/channel parts with I play, Automatic backing and Mute roles, per-part hand/level, global backing mix and saved per-song choices.

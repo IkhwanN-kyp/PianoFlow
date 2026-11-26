@@ -144,6 +144,20 @@ public final class HelpActivity extends Activity {
             + " level changes preserve scores."
       },
       {
+        "Ganti instrumen setiap bagian",
+        "Change each part’s instrument",
+        "Tekan Instrumen pada kartu bagian. Pilih Piano, Flute, Guitar, pilihan cepat lainnya, atau"
+            + " 128 General MIDI. Ikuti instrumen MIDI mengembalikan suara asal. Pilihan tersimpan"
+            + " per lagu dan dipakai saat preview, Pengiring otomatis, serta Dengarkan. Pilihan"
+            + " suara live tetap di tombol Instrumen layar utama. Mengganti instrumen tidak"
+            + " menghapus skor atau mengubah MIDI asal.",
+        "Tap Instrument on a part card. Choose Piano, Flute, Guitar, other quick choices or 128"
+            + " General MIDI. Follow MIDI instrument restores the source sound. Choices persist per"
+            + " song and apply to preview, Automatic backing and Listen. Live keyboard sound stays"
+            + " on the main Instrument button. Changing a preset preserves scores and the original"
+            + " MIDI."
+      },
+      {
         "Apa yang dinilai dan terdengar",
         "What is scored and sounded",
         "Latihan hanya menilai dan menampilkan bagian Saya mainkan. Pengiring diputar otomatis"
@@ -161,16 +175,18 @@ public final class HelpActivity extends Activity {
       {
         "Batas pemisahan instrumen",
         "Instrument separation limits",
-        "Satu track dengan channel berbeda dapat dipisahkan. Track yang berbagi channel tetap"
-            + " berbagi program, sustain, dan pitch bend. Aplikasi tidak menebak pemisahan"
-            + " instrumen yang sudah tercampur pada satu track/channel. Ekspor ulang dari MuseScore"
-            + " dengan channel terpisah bila perlu. Tanpa program MIDI, suara default adalah piano."
-            + " Perkusi channel 10 masih dilewati pada impor.",
-        "Different channels in one track can be separated. Tracks sharing a channel still share"
-            + " program, sustain and pitch bend. The app does not guess how to separate instruments"
-            + " already mixed in one track/channel. Re-export from MuseScore with separate channels"
-            + " when needed. Without a MIDI program, the default sound is piano. Channel-10"
-            + " percussion is still skipped on import."
+        "Satu track dengan channel berbeda dapat dipisahkan. Track yang mengikuti program MIDI di"
+            + " channel sama tetap berbagi program asal. Instrumen tetap pilihan Anda dipisahkan,"
+            + " sedangkan pedal dan pitch bend berkas tetap mengikuti channel sumber. Aplikasi"
+            + " tidak menebak pemisahan instrumen yang sudah tercampur pada satu track/channel."
+            + " Ekspor ulang dari MuseScore dengan channel terpisah bila perlu. Tanpa program MIDI,"
+            + " suara default adalah piano. Perkusi channel 10 masih dilewati pada impor.",
+        "Different channels in one track can be separated. Follow-MIDI tracks sharing a channel"
+            + " still share source programs. Fixed selections are isolated; file pedal and pitch"
+            + " bend still follow the source channel. The app does not guess how to separate"
+            + " instruments already mixed in one track/channel. Re-export from MuseScore with"
+            + " separate channels when needed. Without a MIDI program, the default sound is piano."
+            + " Channel-10 percussion is still skipped on import."
       },
       {
         "Tempo, tangan, dan loop",

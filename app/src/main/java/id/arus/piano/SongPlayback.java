@@ -36,13 +36,26 @@ public final class SongPlayback {
   private final Trainer trainer;
   private final Sink sink;
   private final ArrayList<Event> events = new ArrayList<>();
-  private final int[][] held = new int[16][128];
-  private final boolean[] used = new boolean[16];
+  private final int[][] held;
+  private final boolean[] used;
+  private final int[] sourceChannel, fixedProgram;
+  private final boolean externalMidi;
+  private final Map<Integer, Integer> routes = new HashMap<>();
   private boolean running = false, listening;
   private int cursor, solo = -1, lastSolo = -1;
   private double last = Double.NaN;
 
   public SongPlayback(Trainer trainer, Sink sink) {
+    this(trainer, sink, false);
+  }
+
+  public SongPlayback(Trainer trainer, Sink sink, boolean externalMidi) {
+    this.externalMidi = externalMidi;
+    int capacity = externalMidi ? 16 : 224;
+    held = new int[capacity][128];
+    used = new boolean[capacity];
+    sourceChannel = new int[capacity];
+    fixedProgram = new int[capacity];
     this.trainer = trainer;
     this.sink = sink;
     for (MidiSong.Note n : trainer.song.notes) {
@@ -71,7 +84,7 @@ public final class SongPlayback {
   }
 
   private void controllersOff() {
-    for (int ch = 0; ch < 16; ch++) {
+    for (int ch = 0; ch < used.length; ch++) {
       if (used[ch]) {
         sink.send(ch, 0xb0, 64, 0);
         sink.send(ch, 0xb0, 120, 0);
@@ -88,26 +101,26 @@ public final class SongPlayback {
 
   private void on(MidiSong.Note n) {
     if (!audible(n) || velocity(n) <= 0) return;
-    if (held[n.channel][n.pitch]++ == 0) sink.send(n.channel, 0x90, n.pitch, velocity(n));
+    int channel = routeOf(n);
+    if (held[channel][n.pitch]++ == 0) sink.send(channel, 0x90, n.pitch, velocity(n));
   }
 
   private void off(MidiSong.Note n) {
     if (!audible(n) || velocity(n) <= 0) return;
-    if (held[n.channel][n.pitch] > 0 && --held[n.channel][n.pitch] == 0)
-      sink.send(n.channel, 0x80, n.pitch, 0);
+    int channel = routeOf(n);
+    if (held[channel][n.pitch] > 0 && --held[channel][n.pitch] == 0)
+      sink.send(channel, 0x80, n.pitch, 0);
   }
 
   private void reset(double time) {
     controllersOff();
-    Arrays.fill(used, false);
-    for (MidiSong.Note note : trainer.song.notes)
-      if (audible(note) && velocity(note) > 0) used[note.channel] = true;
-    for (int ch = 0; ch < 16; ch++) {
+    buildRoutes();
+    for (int ch = 0; ch < used.length; ch++) {
       if (!used[ch]) continue;
       sink.send(ch, 0xb0, 121, 0);
       sink.send(ch, 0xb0, 0, 0);
       sink.send(ch, 0xb0, 32, 0);
-      sink.send(ch, 0xc0, 0, 0);
+      sink.send(ch, 0xc0, Math.max(0, fixedProgram[ch]), 0);
       sink.send(ch, 0xe0, 0, 64);
     }
     // Rebuild controllers without sounding every historical note on a seek/resume.
@@ -123,8 +136,59 @@ public final class SongPlayback {
   }
 
   private void message(MidiSong.Message m) {
-    // MIDI program/pedal/bank/pitch state belongs to a channel, including conductor tracks.
-    if (used[m.status & 15]) sink.send(m.status & 15, m.status & 240, m.a, m.b);
+    int kind = m.status & 240;
+    for (int channel = 0; channel < used.length; channel++) {
+      if (!used[channel] || sourceChannel[channel] != (m.status & 15)) continue;
+      // Fixed GM presets are isolated from file Program Change and bank messages.
+      if (fixedProgram[channel] >= 0 && (kind == 0xc0 || (kind == 0xb0 && (m.a == 0 || m.a == 32))))
+        continue;
+      sink.send(channel, kind, m.a, m.b);
+    }
+  }
+
+  public int routeOf(MidiSong.Note note) {
+    return routes.getOrDefault(Arrangement.key(note), note.channel);
+  }
+
+  private void buildRoutes() {
+    Arrays.fill(used, false);
+    Arrays.fill(fixedProgram, -1);
+    routes.clear();
+    Set<Integer> active = new TreeSet<>();
+    for (MidiSong.Note note : trainer.song.notes)
+      if (audible(note) && velocity(note) > 0) active.add(Arrangement.key(note));
+    // Unmodified parts retain the original channel and file controller semantics.
+    for (int key : active) {
+      Arrangement.Part part = trainer.arrangement.get(key);
+      if (part.instrument < 0) {
+        routes.put(key, part.channel);
+        used[part.channel] = true;
+        sourceChannel[part.channel] = part.channel;
+      }
+    }
+    Map<Integer, Integer> groups = new HashMap<>();
+    for (int key : active) {
+      Arrangement.Part part = trainer.arrangement.get(key);
+      if (part.instrument < 0) continue;
+      int group = part.key;
+      Integer channel = groups.get(group);
+      if (channel == null) {
+        channel = externalMidi ? 1 : 16;
+        while (channel < used.length && (used[channel] || (externalMidi && channel == 9)))
+          channel++;
+        if (channel >= used.length)
+          throw new IllegalStateException(
+              externalMidi
+                  ? "Not enough melodic MIDI OUT channels. Use tablet audio or reduce active"
+                      + " instrument groups."
+                  : "Too many independent instrument groups for the 224-voice-route audio engine.");
+        groups.put(group, channel);
+        used[channel] = true;
+        sourceChannel[channel] = part.channel;
+        fixedProgram[channel] = part.instrument;
+      }
+      routes.put(key, channel);
+    }
   }
 
   public void sync(double time, boolean playing, boolean listen) {
