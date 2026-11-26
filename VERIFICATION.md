@@ -9,6 +9,10 @@ Diperiksa 26 November 2026 (Asia/Jakarta). Hasil kompilasi, emulator dan hardwar
 - Dua track belajar yang memainkan pitch/onset sama dipenuhi satu penekanan; Note Off satu part tidak memutus unison part lain. Pilihan suara pemain tidak mengubah program GM pengiring tablet. Program/pedal/bend tetap state channel bersama; instrumen yang tercampur dalam satu track/channel tidak ditebak terpisah. Perkusi channel 10 masih dilewati.
 - Bank dan sumber vendor tetap dipin; tidak ada lagu komersial baru. `samples/duet-asli.mid` adalah lima not orisinal yang dihasilkan oleh tes. Pengujian fisik MatePad/P-145, dukungan suara GM perangkat MIDI OUT, dan latensi USB/audio tetap belum dilakukan.
 
+Rilis beta.6 berhasil melewati job test dan release otomatis: https://github.com/IkhwanN-kyp/PianoFlow/actions/runs/45738228357 . CI Android tanpa Google Play Services lulus 216 pemeriksaan runtime; fixture privat menambah pemeriksaan ARM64 menjadi 223. APK resmi dipasang menimpa versi emulator dan kembali lulus 223 pemeriksaan, termasuk marker data lama yang tetap terbaca. Package `id.arus.piano`, versi `0.2.0-beta.6`, kode `2002006`, non-debuggable, sertifikat tetap sama. Ukuran 27.171.856 byte; SHA-256 `6428201a3e49e6ecfc6035b484f4155fdfc0205befb5ee7a6138778055ac3e47` serta signature diverifikasi ulang setelah unduhan. Rilis: https://github.com/IkhwanN-kyp/PianoFlow/releases/tag/v0.2.0-beta.6 .
+
+![Bagian dan pengiring](docs/screenshots/parts-backing.png)
+
 ## Bermain bebas, label, dan panduan beta.5
 
 - Build native ARM64 dan Android lint berhasil; pemeriksaan core lama 43 assertion + 300 mutasi dan 110 pemeriksaan tetap lolos. Tambahan 391 pemeriksaan mencakup arah/durasi jejak, memori terbatas, retrigger, batas input, serta label 88 tuts.
